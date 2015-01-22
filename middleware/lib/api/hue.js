@@ -62,7 +62,6 @@ module.exports = {
             .route('/hue/light/:light_id/dim')
             .post(performPromise(hue.light.prototype.dim, "brightness"));
 
-
         // Get
         api.request_router
             .route('/hue/group/:light_group_id')

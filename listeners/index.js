@@ -51,7 +51,7 @@ var startListeners = function startListeners() {
         "Living Room Wemo turned off all lights"
     );
 
-    // Whenever the living room lights go to off or on, the wemo should get set to the proper state
+    // Whenever the living room lights goes to off or on, the wemo should be set to the proper state
     addListener(
         living_room_lights,
         "change",

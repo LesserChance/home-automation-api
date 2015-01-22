@@ -22,7 +22,7 @@ TwilioPhone.prototype.sendSMS = function sendSMS(number, message) {
         to: number,
         from: this.id
     }, function(err, message) {
-        this.emit("sms_sent", message, 1, 2, 3);
+        this.emit("sms_sent", message);
         deferred.resolve();
     }.bind(this));
 
