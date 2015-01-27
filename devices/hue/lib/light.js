@@ -14,12 +14,8 @@ function HueLight(data) {
     this.loaded = false;
     this.state = null;
 
-    this.api = require("./host").getApi();
-
     // Retrieve the current light status
-    this.api.lightStatus(this.id)
-        .then(init.bind(this))
-        .done();
+    init.call(this, data);
 }
 
 util.inherits(HueLight, eventEmitter);
@@ -47,8 +43,11 @@ HueLight.prototype.setOn = function setOn() {
         this.once("on", function() {
             deferred.resolve();
         });
-        this.api
-            .setLightState(this.id, {"on": true});
+        require("./host").performRequest(
+            "/lights/" + this.id + "/state",
+            "PUT",
+            {"on": true}
+        );
     }
 
     return deferred.promise;
@@ -67,8 +66,11 @@ HueLight.prototype.setOff = function setOff() {
         this.once("off", function() {
             deferred.resolve();
         });
-        this.api
-            .setLightState(this.id, {"on": false});
+        require("./host").performRequest(
+            "/lights/" + this.id + "/state",
+            "PUT",
+            {"on": false}
+        );
     }
 
     return deferred.promise;
@@ -94,11 +96,15 @@ HueLight.prototype.dim = function dim(brightness) {
         this.emit('turning_on');
         this.emit('dimming');
 
-        return this.api
-            .setLightState(this.id, {
-                "on": true,
-                "bri": parseInt(brightness, 10)
-            })
+        return require("./host")
+            .performRequest(
+                "/lights/" + this.id + "/state",
+                "PUT",
+                {
+                    "on": true,
+                    "bri": parseInt(brightness, 10)
+                }
+            )
             .then(function() {
                 this.state.on = true;
                 this.emit('on');
@@ -108,10 +114,14 @@ HueLight.prototype.dim = function dim(brightness) {
     } else {
         this.emit('dimming');
 
-        return this.api
-            .setLightState(this.id, {
-                "bri": parseInt(brightness, 10)
-            })
+        return require("./host")
+            .performRequest(
+                "/lights/" + this.id + "/state",
+                "PUT",
+                {
+                    "bri": parseInt(brightness, 10)
+                }
+            )
             .then(function() {
                 this.emit("dimmed");
             }.bind(this));

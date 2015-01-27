@@ -37,55 +37,84 @@ module.exports = {
             }
         });
 
+        /*************************************
+         * LIGHTS                            *
+         *************************************/
         // Get
         api.request_router
-            .route('/hue/light/:light_id')
+            .route('/hue/lights/:light_id')
             .get(sendDeviceResponse);
 
         // On
         api.request_router
-            .route('/hue/light/:light_id/on')
+            .route('/hue/lights/:light_id/on')
             .post(performPromise(hue.light.prototype.setOn));
 
         // Off
         api.request_router
-            .route('/hue/light/:light_id/off')
+            .route('/hue/lights/:light_id/off')
             .post(performPromise(hue.light.prototype.setOff));
 
         // Flip
         api.request_router
-            .route('/hue/light/:light_id/flip')
+            .route('/hue/lights/:light_id/flip')
             .post(performPromise(hue.light.prototype.flip));
 
         // Dim
         api.request_router
-            .route('/hue/light/:light_id/dim')
+            .route('/hue/lights/:light_id/dim')
             .post(performPromise(hue.light.prototype.dim, "brightness"));
 
+        /*************************************
+         * LIGHT GROUPS                      *
+         *************************************/
         // Get
         api.request_router
-            .route('/hue/group/:light_group_id')
+            .route('/hue/groups/:light_group_id')
             .get(sendDeviceResponse);
 
         // On
         api.request_router
-            .route('/hue/group/:light_group_id/on')
+            .route('/hue/groups/:light_group_id/on')
             .post(performPromise(hue.light_group.prototype.setOn));
 
         // Off
         api.request_router
-            .route('/hue/group/:light_group_id/off')
+            .route('/hue/groups/:light_group_id/off')
             .post(performPromise(hue.light_group.prototype.setOff));
 
         // Flip
         api.request_router
-            .route('/hue/group/:light_group_id/flip')
+            .route('/hue/groups/:light_group_id/flip')
             .post(performPromise(hue.light_group.prototype.flip));
 
         // Dim
         api.request_router
-            .route('/hue/group/:light_group_id/dim')
+            .route('/hue/groups/:light_group_id/dim')
             .post(performPromise(hue.light_group.prototype.dim, "brightness"));
+
+//        /*************************************
+//         * LIGHT SCENES                      *
+//         *************************************/
+//        // Get
+//        api.request_router
+//            .route('/hue/scenes/:light_scene_id')
+//            .get(sendDeviceResponse);
+//
+//        // Create
+//        api.request_router
+//            .route('/hue/scenes')
+//            .post(performPromise(hue.light_scene.prototype.create));
+//
+//        // Update
+//        api.request_router
+//            .route('/hue/scenes/:light_scene_id')
+//            .put(performPromise(hue.light_scene.prototype.update));
+//
+//        // On
+//        api.request_router
+//            .route('/hue/scenes/:light_scene_id/on')
+//            .post(performPromise(hue.light_scene.prototype.setOn));
    }
 };
 

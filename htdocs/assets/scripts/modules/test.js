@@ -15,7 +15,7 @@ define(['jquery'], function($) {
 
     var get = function on() {
         $.ajax({
-                "url": "/api/wemo/living_room",
+                "url": "/api/wemos/living_room",
                 "type": "GET",
             })
             .done(function(data) {
@@ -28,7 +28,7 @@ define(['jquery'], function($) {
 
     var on = function on() {
         $.ajax({
-                "url": "/api/wemo/living_room/on",
+                "url": "/api/wemos/living_room/on",
                 "type": "POST",
             })
             .done(function(data) {
@@ -41,7 +41,7 @@ define(['jquery'], function($) {
 
     var off = function off() {
         $.ajax({
-                "url": "/api/wemo/living_room/off",
+                "url": "/api/wemos/living_room/off",
                 "type": "POST",
             })
             .done(function(data) {
@@ -54,7 +54,7 @@ define(['jquery'], function($) {
 
     var flip = function flip() {
         $.ajax({
-                "url": "/api/wemo/living_room/flip",
+                "url": "/api/wemos/living_room/flip",
                 "type": "POST",
             })
             .done(function(data) {
@@ -67,7 +67,7 @@ define(['jquery'], function($) {
 
 //    var lighton = function lighton(e) {
 //        $.ajax({
-//                "url": "/api/hue/light/" + $(e.target).data("light-id") + "/on",
+//                "url": "/api/hue/lights/" + $(e.target).data("light-id") + "/on",
 //                "type": "POST",
 //            })
 //            .done(function(data) {
@@ -80,7 +80,7 @@ define(['jquery'], function($) {
 //
 //    var lightoff = function lightoff(e) {
 //        $.ajax({
-//                "url": "/api/hue/light/" + $(e.target).data("light-id") + "/off",
+//                "url": "/api/hue/lights/" + $(e.target).data("light-id") + "/off",
 //                "type": "POST",
 //            })
 //            .done(function(data) {
@@ -94,7 +94,7 @@ define(['jquery'], function($) {
     var lightflip = function lightflip(e) {
         var light_id = $(e.target).data("light-id");
         $.ajax({
-            "url": "/api/hue/light/" + light_id + "/flip",
+            "url": "/api/hue/lights/" + light_id + "/flip",
             "type": "POST"
         })
             .done(function(results) {
@@ -111,7 +111,7 @@ define(['jquery'], function($) {
         var val = $(e.target).val();
 
         $.ajax({
-            "url": "/api/hue/light/" + light_id + "/dim",
+            "url": "/api/hue/lights/" + light_id + "/dim",
             "type": "POST",
             "data": {
                 "brightness": parseInt(val, 10)
@@ -128,7 +128,7 @@ define(['jquery'], function($) {
     var lightgroupflip = function lightgroupflip(e) {
         var light_group_id = $(e.target).data("light-group-id");
         $.ajax({
-            "url": "/api/hue/group/" + light_group_id + "/flip",
+            "url": "/api/hue/groups/" + light_group_id + "/flip",
             "type": "POST"
         })
             .done(function(results) {
@@ -145,7 +145,7 @@ define(['jquery'], function($) {
         var val = $(e.target).val();
 
         $.ajax({
-            "url": "/api/hue/group/" + light_group_id + "/dim",
+            "url": "/api/hue/groups/" + light_group_id + "/dim",
             "type": "POST",
             "data": {
                 "brightness": parseInt(val, 10)

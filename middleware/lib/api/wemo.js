@@ -29,22 +29,22 @@ module.exports = {
 
         // Get
         api.request_router
-            .route('/wemo/:device_name')
+            .route('/wemos/:device_name')
             .get(sendDeviceResponse);
 
         // On
         api.request_router
-            .route('/wemo/:device_name/on')
+            .route('/wemos/:device_name/on')
             .post(performPromise(wemo.device.prototype.setOn));
 
         // Off
         api.request_router
-            .route('/wemo/:device_name/off')
+            .route('/wemos/:device_name/off')
             .post(performPromise(wemo.device.prototype.setOff));
 
         // Flip
         api.request_router
-            .route('/wemo/:device_name/flip')
+            .route('/wemos/:device_name/flip')
             .post(performPromise(wemo.device.prototype.flip));
     }
 };

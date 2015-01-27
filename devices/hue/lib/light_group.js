@@ -25,15 +25,11 @@ function HueLightGroup(data) {
     this.loaded = false;
     this.state = null;
 
-    this.api = require("./host").getApi();
-
     // when an event is triggered causing a light change, poll more frequently
     this.light_devices.onDeviceEvent("change", this.handleNewState.bind(this));
 
     // Retrieve the current light status
-    this.api.getGroup(this.id)
-        .then(init.bind(this))
-        .done();
+    init.call(this, data);
 }
 
 util.inherits(HueLightGroup, eventEmitter);
@@ -72,8 +68,11 @@ HueLightGroup.prototype.setOn = function setOn() {
         this.once("on", function() {
             deferred.resolve();
         });
-        this.api
-            .setGroupLightState(this.id, {"on": true});
+        require("./host").performRequest(
+            "/groups/" + this.id + "/action",
+            "PUT",
+            {"on": true}
+        );
     }
 
     return deferred.promise;
@@ -92,8 +91,11 @@ HueLightGroup.prototype.setOff = function setOff() {
         this.once("off", function() {
             deferred.resolve();
         });
-        this.api
-            .setGroupLightState(this.id, {"on": false});
+        require("./host").performRequest(
+            "/groups/" + this.id + "/action",
+            "PUT",
+            {"on": false}
+        );
     }
 
     return deferred.promise;
@@ -123,8 +125,8 @@ HueLightGroup.prototype.dim = function dim(brightness) {
             "bri": parseInt(brightness, 10)
         };
 
-        return this.api
-            .setGroupLightState(this.id, new_state)
+        return require("./host")
+            .performRequest( "/groups/" + this.id + "/action", "PUT", new_state)
             .then(function() {
                 this.state = STATE_ON;
                 this.emits(['on','changed','dimmed']);
@@ -137,8 +139,8 @@ HueLightGroup.prototype.dim = function dim(brightness) {
             "bri": parseInt(brightness, 10)
         };
 
-        return this.api
-            .setGroupLightState(this.id, new_state)
+        return require("./host")
+            .performRequest("/groups/" + this.id + "/action", "PUT", new_state)
             .then(function() {
                 this.emit("dimmed");
                 updateLightState.call(this, new_state);
