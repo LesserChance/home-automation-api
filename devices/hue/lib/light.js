@@ -2,12 +2,22 @@
 var eventEmitter = require('events').EventEmitter;
 var util         = require('util');
 var Q            = require('q');
+var rgb          = require('node-hue-api/hue-api/rgb');
+
+// Local Modules
+var HueDevice    = require("./device");
+
+var STATE_OFF  = false;
+var STATE_ON   = true;
 
 /**
  * Public events are:
  * Public methods are: 
  */
 function HueLight(data) {
+    this.api_path = "/lights/";
+    this.action_url = "/state";
+
     this.id = data.id;
     this.name = data.name;
 
@@ -18,127 +28,16 @@ function HueLight(data) {
     init.call(this, data);
 }
 
-util.inherits(HueLight, eventEmitter);
+util.inherits(HueLight, HueDevice);
 
-/**
-* The device has retrieved it's initial state
-*/
-var init = function init(data) {
-    this.state = data.state;
-    this.loaded = true;
-    this.emit("load");
-};
-
-
-/**
- * Turn the device on
- */
-HueLight.prototype.setOn = function setOn() {
-    var deferred = Q.defer();
-
-    if (this.state.on) {
-        deferred.resolve();
-    } else {
-        this.emit('turning_on');
-        this.once("on", function() {
-            deferred.resolve();
-        });
-        require("./host").performRequest(
-            "/lights/" + this.id + "/state",
-            "PUT",
-            {"on": true}
-        );
-    }
-
-    return deferred.promise;
+HueLight.prototype.constants = {
+    STATE_OFF : STATE_OFF,
+    STATE_ON  : STATE_ON
 };
 
 /**
- * Turn the device off
- */
-HueLight.prototype.setOff = function setOff() {
-    var deferred = Q.defer();
-
-    if (!this.state.on) {
-        deferred.resolve();
-    } else {
-        this.emit('turning_off');
-        this.once("off", function() {
-            deferred.resolve();
-        });
-        require("./host").performRequest(
-            "/lights/" + this.id + "/state",
-            "PUT",
-            {"on": false}
-        );
-    }
-
-    return deferred.promise;
-};
-
-/**
- * Flip the device
- */
-HueLight.prototype.flip = function flip() {
-    if (this.state.on) {
-        return this.setOff();
-    } else {
-        return this.setOn();
-    }
-};
-
-
-/**
- * Dim the device
- */
-HueLight.prototype.dim = function dim(brightness) {
-    if (!this.state.on) {
-        this.emit('turning_on');
-        this.emit('dimming');
-
-        return require("./host")
-            .performRequest(
-                "/lights/" + this.id + "/state",
-                "PUT",
-                {
-                    "on": true,
-                    "bri": parseInt(brightness, 10)
-                }
-            )
-            .then(function() {
-                this.state.on = true;
-                this.emit('on');
-                this.emit('change');
-                this.emit("dimmed");
-            }.bind(this));
-    } else {
-        this.emit('dimming');
-
-        return require("./host")
-            .performRequest(
-                "/lights/" + this.id + "/state",
-                "PUT",
-                {
-                    "bri": parseInt(brightness, 10)
-                }
-            )
-            .then(function() {
-                this.emit("dimmed");
-            }.bind(this));
-    }
-};
-
-/**
- * get a json representation of this light
- * @returns Object
- */
-HueLight.prototype.toJson = function toJson() {
-    return {
-        state: this.state
-    };
-};
-
-/**
+ * Check to see if this new state (pulled from the bridge) is different then the current
+ * @return boolean - true if the state has changed
  */
 HueLight.prototype.handleNewState = function handleNewState(new_state) {
     // Check on/off
@@ -155,7 +54,19 @@ HueLight.prototype.handleNewState = function handleNewState(new_state) {
     }
 
     return state_changed;
+};
 
+/***************************************
+ * PRIVATE FUNCTIONS                   *
+ ***************************************/
+/**
+ * The device has retrieved it's initial state
+ */
+var init = function init(data) {
+    this.state = data.state;
+    this.model_id = data.modelId;
+    this.loaded = true;
+    this.emit("load");
 };
 
 module.exports = HueLight;

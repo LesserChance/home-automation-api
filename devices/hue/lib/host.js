@@ -133,13 +133,15 @@ var poll = function poll() {
 var updateLightState = function updateLightState(data) {
     var state_changed = false;
     for (var key in data.lights) {
-        var light = data.lights[key];
+        var light = data.lights[key],
+            light_changed = this.light_list.get(key).handleNewState(light.state);
 
-        state_changed = state_changed || this.light_list.get(key).handleNewState(light.state);
+        state_changed = state_changed || light_changed;
     }
 
     if (state_changed) {
-        //state has changed, increase the poll rate automatically for a bit
+        // state has changed, increase the poll rate automatically for a bit
+        // because its likely to change again
         this.increasePollRate();
     }
 };

@@ -27,7 +27,7 @@ var self = module.exports = {
 
     init: function init(app) {
         // Properly handle any timeouts
-        self.request_router.use(timeout('15s', function(req, res, next) {
+        self.request_router.use(timeout('5s', function(req, res, next) {
             envelope(res, 503, {"timeout": "5000"}, 'Response timeout', 'ETIMEDOUT');
         }));
 

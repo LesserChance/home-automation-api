@@ -44,7 +44,7 @@ var startListeners = function startListeners() {
         living_room_wemo,
         "off",
         function() {
-            if (living_room_lights.state !== 0) {
+            if (living_room_lights.state.on !== 0) {
                 living_room_lights.setOff();
             }
         },
@@ -61,7 +61,7 @@ var startListeners = function startListeners() {
                 // Whenever the living room lights are changed from off, turn on the wemo
                 living_room_wemo.reflectState(true);
                 logEvent("Living Room Lights are now on, turn on wemo");
-            } else if (living_room_lights.state == living_room_lights.constants.STATE_OFF) {
+            } else if (living_room_lights.state.on == living_room_lights.constants.STATE_OFF) {
                 // Whenever the living room lights are changed to off, turn off the wemo
                 living_room_wemo.reflectState(false);
                 logEvent("Living Room Lights are now off, turn off wemo");

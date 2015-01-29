@@ -13,7 +13,7 @@ var WemoDevice = function(data) {
 
     this.id = data.id;
     this.loaded = false;
-    this.state = null;
+    this.state = {"on":null};
     this.state_deferred = null;
 
     wemoNode.once("state_changed", init.bind(this));
@@ -25,13 +25,11 @@ util.inherits(WemoDevice, eventEmitter);
  * The device's state has changed
  */
 WemoDevice.prototype.handleStateChange = function handleStateChange(data) {
-    if (this.state != data.binarystate) {
-        this.state = data.binarystate;
+    if (this.state.on != data.binarystate) {
+        this.state.on = data.binarystate;
 
         // Emit a change event
-        this.emit('change', {
-            "state" : this.state
-        });
+        this.emit('change');
 
         if (data.binarystate) {
             this.emit('on');
@@ -52,7 +50,7 @@ WemoDevice.prototype.handleStateChange = function handleStateChange(data) {
 WemoDevice.prototype.setOn = function setOn() {
     var deferred = Q.defer();
 
-    if (this.state) {
+    if (this.state.on) {
         deferred.resolve();
     } else {
         setBinaryState.call(this, 1, deferred);
@@ -67,7 +65,7 @@ WemoDevice.prototype.setOn = function setOn() {
 WemoDevice.prototype.setOff = function setOn() {
     var deferred = Q.defer();
 
-    if (!this.state) {
+    if (!this.state.on) {
         deferred.resolve();
     } else {
         setBinaryState.call(this, 0, deferred);
@@ -81,7 +79,7 @@ WemoDevice.prototype.setOff = function setOn() {
  */
 WemoDevice.prototype.flip = function flip() {
     var deferred = Q.defer();
-    setBinaryState.call(this, this.state ? 0 : 1, deferred);
+    setBinaryState.call(this, this.state.on ? 0 : 1, deferred);
     return deferred.promise;
 };
 
@@ -90,7 +88,7 @@ WemoDevice.prototype.flip = function flip() {
  * @param new_state - boolean
  */
 WemoDevice.prototype.reflectState = function reflectState(new_state) {
-    this.state = (new_state ? 1 : 0);
+    this.state.on = (new_state ? 1 : 0);
     setBinaryState.call(this, new_state ? 1 : 0, null);
 };
 
@@ -110,7 +108,7 @@ WemoDevice.prototype.toJson = function toJson() {
  * The device has retrieved it's initial state
  */
 var init = function init(data) {
-    this.state = data.binarystate;
+    this.state.on = data.binarystate;
     this.loaded = true;
 
     this.emit("load");
