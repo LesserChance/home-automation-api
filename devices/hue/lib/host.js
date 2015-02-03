@@ -17,8 +17,8 @@ var api;
 var bridge;
 var base_url = "/api/" + config.hue_username;
 
-var fast_poll = 111;
-var slow_poll = 5000;
+var fast_poll = 500;
+var slow_poll = 10000;
 var decrease_poll_time = 20000;
 
 var HueHost = function () {
@@ -44,13 +44,27 @@ var HueHost = function () {
             } else {
                 bridge = results[0];
             }
-        })
-        .then(getLights.bind(this))
-        .then(getLightGroups.bind(this))
-        .then(ready.bind(this))
+
+            //test the connection
+            this.performRequest("/lights")
+                .then(function(data) {
+                    if (data && data.length && data[0].error && data[0].error.type == 1) {
+                        //need to create a user
+                        this.createUser();
+                    } else {
+                        this.start();
+                    }
+                }.bind(this));
+        }.bind(this))
         .done();
 };
 util.inherits(HueHost, eventEmitter);
+
+HueHost.prototype.start = function start() {
+    getLights.call(this)
+        .then(getLightGroups.bind(this))
+        .then(ready.bind(this))
+};
 
 HueHost.prototype.performRequest = function performRequest(path, method, data) {
     return request.perform(bridge.ipaddress, base_url + path, method, data, null, false);
@@ -72,6 +86,23 @@ HueHost.prototype.increasePollRate = function increasePollRate() {
             this.poll_timeout = slow_poll;
         }.bind(this), decrease_poll_time);
     }
+};
+
+HueHost.prototype.createUser = function createUser() {
+    console.debug("Click the fucking button");
+
+    return request
+        .perform(bridge.ipaddress, "/api", "POST", {
+            "devicetype": "bateman#lightserver",
+            "username": config.hue_username
+        }, null, false)
+        .then(function(data) {
+            if (!data[0].success) {
+                setTimeout(this.createUser.bind(this), 2000);
+            } else {
+                this.start();
+            }
+        }.bind(this));
 };
 
 /*****************************************

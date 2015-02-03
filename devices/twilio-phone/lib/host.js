@@ -31,7 +31,6 @@ TwilioHost.prototype.init = function init() {
     this.phone_list.add(config.device_ids.twilio_phone, new TwilioPhone({
         id: config.device_ids.twilio_phone
     }));
-
 };
 
 TwilioHost.prototype.getPhone = function getPhone(device_id) {

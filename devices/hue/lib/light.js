@@ -2,13 +2,12 @@
 var eventEmitter = require('events').EventEmitter;
 var util         = require('util');
 var Q            = require('q');
-var rgb          = require('node-hue-api/hue-api/rgb');
 
 // Local Modules
 var HueDevice    = require("./device");
 
-var STATE_OFF  = false;
-var STATE_ON   = true;
+// constants
+var LIGHT_STATE  = require("../../../constants/light_state");
 
 /**
  * Public events are:
@@ -20,6 +19,7 @@ function HueLight(data) {
 
     this.id = data.id;
     this.name = data.name;
+    this.model_id = data.modelId;
 
     this.loaded = false;
     this.state = null;
@@ -31,8 +31,7 @@ function HueLight(data) {
 util.inherits(HueLight, HueDevice);
 
 HueLight.prototype.constants = {
-    STATE_OFF : STATE_OFF,
-    STATE_ON  : STATE_ON
+    STATE_ON : LIGHT_STATE.LIGHT_ON
 };
 
 /**
@@ -63,6 +62,9 @@ HueLight.prototype.handleNewState = function handleNewState(new_state) {
  * The device has retrieved it's initial state
  */
 var init = function init(data) {
+//    console.debug(data);
+//    console.debug("------------");
+
     this.state = data.state;
     this.model_id = data.modelId;
     this.loaded = true;

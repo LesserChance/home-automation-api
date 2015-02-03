@@ -2,6 +2,7 @@
 var eventEmitter = require('events').EventEmitter;
 var util         = require('util');
 var Q            = require('q');
+var rgb          = require('node-hue-api/hue-api/rgb');
 
 // App Modules
 var MultiEmit     = require("../../../util/multi_emitter");
@@ -13,6 +14,7 @@ function HueDevice() {
     this.id = null;
     this.api_path = null;
     this.action_url = null;
+    this.transition_time = null;
 }
 
 util.inherits(HueDevice, eventEmitter);
@@ -104,51 +106,13 @@ HueDevice.prototype.flip = function flip() {
     }
 };
 
-/***************************************
- * STATE CHANGE CALLBACKS              *
- ***************************************/
-/**
- * Private
- * Callback after a new state occurs
- * @param event - the event that triggered on start
- * @param new_state
- */
-var handleFinishedState = function handleFinishedState(event, new_state) {
-    switch (event) {
-        case "dimming":
-            this.emit("dimmed");
-            break;
-
-        case "starting_effect":
-            this.emit(new_state.effect !== "none" ? 'effect_start' : 'effect_end');
-            break;
-    }
-
-    this.handleStateEventEnd(event, new_state);
-};
-
-/**
- * Private
- * Callback after a new state occurs (if the device had to be turned on)
- * @param event - the event that triggered on start
- * @param new_state
- */
-var handleFinishedStateFromOff = function handleFinishedStateFromOff(event, new_state) {
-    var previous_state = this.state.on;
-    this.state.on = this.constants.STATE_ON;
-    this.emits(['on','changed'], {"previous_state": previous_state});
-
-    handleFinishedState.call(this, event, new_state);
-};
-
 /**
  * Protected
  * Callback after a new state occurs - used for implementation in child class
- * @param event - the event that triggered on start
- * @param new_state
+ * @param transition_time - time in ms
  */
-HueDevice.prototype.handleStateEventEnd = function handleStateEventEnd(event, new_state) {
-    // implement in child class
+HueDevice.prototype.setTransitionTime = function setTransitionTime(transition_time) {
+    this.transition_time = Math.floor(transition_time / 100);
 };
 
 /***************************************
@@ -175,6 +139,18 @@ HueDevice.prototype.colorLoop = function colorLoop(length) {
     }.bind(this), length);
 
     return this.effect("colorloop");
+};
+
+/**
+ * Set the device color
+ */
+HueDevice.prototype.color = function dim(hex) {
+    return this.setNewState(
+        {
+            "xy": rgb.convertRGBtoXY(hexToRgb(hex), {modelId: this.model_id})
+        },
+        'setting_color'
+    );
 };
 
 /**
@@ -216,13 +192,75 @@ HueDevice.prototype.setNewState = function setNewState(new_state, emit_event) {
         callback = handleFinishedStateFromOff.bind(this);
     }
 
-    this.emits(emit_events);
+    this.emits(emit_events, {state: new_state});
+
+    new_state.transitiontime = this.transition_time;
 
     return require("./host")
         .performRequest(this.getActionUrl(), "PUT", new_state)
         .then(function() {
             callback(emit_event, new_state)
         });
+};
+
+/***************************************
+ * STATE CHANGE CALLBACKS              *
+ ***************************************/
+/**
+ * Private
+ * Callback after a new state occurs
+ * @param event - the event that triggered on start
+ * @param new_state
+ */
+var handleFinishedState = function handleFinishedState(event, new_state) {
+    switch (event) {
+        case "dimming":
+            this.emit("dimmed", {state: new_state});
+            break;
+
+        case "setting_color":
+            this.emit("set_color", {state: new_state});
+            break;
+
+        case "starting_effect":
+            this.emit(new_state.effect !== "none" ? 'effect_start' : 'effect_end', {state: new_state});
+            break;
+    }
+
+    this.handleStateEventEnd(event, new_state);
+};
+
+/**
+ * Private
+ * Callback after a new state occurs (if the device had to be turned on)
+ * @param event - the event that triggered on start
+ * @param new_state
+ */
+var handleFinishedStateFromOff = function handleFinishedStateFromOff(event, new_state) {
+    var previous_state = this.state.on;
+    this.state.on = this.constants.STATE_ON;
+    this.emits(['on','changed'], {"previous_state": previous_state});
+
+    handleFinishedState.call(this, event, new_state);
+};
+
+/**
+ * Protected
+ * Callback after a new state occurs - used for implementation in child class
+ * @param event - the event that triggered on start
+ * @param new_state
+ */
+HueDevice.prototype.handleStateEventEnd = function handleStateEventEnd(event, new_state) {
+    // implement in child class
+};
+
+var hexToRgb = function hexToRgb(hex) {
+    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    return result ? [
+        parseInt(result[1], 16),
+        parseInt(result[2], 16),
+        parseInt(result[3], 16)
+    ] : null;
 };
 
 module.exports = HueDevice;

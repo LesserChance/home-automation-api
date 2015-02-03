@@ -10,9 +10,8 @@ var DeviceList    = require("../../../util/device_list");
 // Local Modules
 var HueDevice    = require("./device");
 
-var STATE_OFF  = 0;
-var STATE_ON   = 1;
-var STATE_DIFF = 2;
+// constants
+var LIGHT_STATE  = require("../../../constants/light_state");
 
 /**
  *
@@ -38,9 +37,7 @@ function HueLightGroup(data) {
 util.inherits(HueLightGroup, HueDevice);
 
 HueLightGroup.prototype.constants = {
-    STATE_OFF  : STATE_OFF,
-    STATE_ON   : STATE_ON,
-    STATE_DIFF : STATE_DIFF
+    STATE_ON : LIGHT_STATE.GROUP_ON
 };
 
 /***************************************
@@ -70,6 +67,9 @@ var init = function init(data) {
     }
     this.state.on = getCurrentState.call(this);
 
+    // assume the lights are all the same model
+    this.model_id = light.modelId;
+
     this.loaded = true;
     this.emit("load");
 };
@@ -89,11 +89,11 @@ var getCurrentState = function getCurrentState() {
     }
 
     if (on_count === this.lights.length) {
-        return STATE_ON;
+        return LIGHT_STATE.GROUP_ON;
     } else if (on_count > 0) {
-        return STATE_DIFF;
+        return LIGHT_STATE.GROUP_DIFF;
     }
-    return STATE_OFF;
+    return LIGHT_STATE.GROUP_OFF;
 };
 
 /**
@@ -122,9 +122,9 @@ var handleNewLightState = function handleNewLightState() {
     if (new_state != this.state.on) {
         var previous_state = this.state.on;
         this.state.on = new_state;
-        if (new_state === STATE_ON) {
+        if (new_state === LIGHT_STATE.GROUP_ON) {
             this.emits(['on', 'change'], {"previous_state": previous_state});
-        } else if (new_state === STATE_DIFF) {
+        } else if (new_state === LIGHT_STATE.GROUP_DIFF) {
             this.emits(['diff', 'change'], {"previous_state": previous_state});
         } else {
             this.emits(['off', 'change'], {"previous_state": previous_state});

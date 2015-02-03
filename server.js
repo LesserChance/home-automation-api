@@ -9,14 +9,18 @@ var http       = require('http');
 // App Modules
 var config     = require("./util/config");
 
-// Init Listeners
-require('./listeners').initialize(app);
-
 // Init Middleware (static and API)
 require('./middleware').initialize(app);
+
+// Start the DB
+var mongoose   = require('mongoose');
+mongoose.connect('mongodb://localhost/lightserver');
 
 // START THE SERVER
 var httpServer = http.createServer(app);
 httpServer.listen(config.port);
 
 console.log('Server Initialized, port ' + config.port);
+
+// Init Listeners
+require('./listeners').initialize(app);

@@ -28,6 +28,9 @@ var WemoHost = function () {
     wemoNode.on("device_lost", function (device) {
         this.device_list.remove(device.id);
         delete this.device_data[device.id];
+
+        // try to pick it back up
+        wemoNode.startDiscovery();
     }.bind(this));
 
     wemoNode.startDiscovery();
