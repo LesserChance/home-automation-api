@@ -47,6 +47,10 @@ DeviceList.prototype = {
         return this.devices;
     },
 
+    getAllIds: function getAllIds() {
+        return Object.keys(this.devices);
+    },
+
     getNamedDevice: function getNamedDevice(name) {
         return this.devices[config.device_ids[name]];
     },

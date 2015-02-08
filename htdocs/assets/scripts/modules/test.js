@@ -5,12 +5,17 @@ define(['jquery'], function($) {
         $("#api_3").on("click", flip);
         $("#api_4").on("click", get);
 
-//        $(".api_light_on").on("click", lighton);
-//        $(".api_light_off").on("click", lightoff);
         $(".api_light_flip").on("click", lightflip);
         $(".api_light_dim").on("change", lightdim);
+        $(".api_light_color").on("input", lightcolor);
+
         $(".api_light_group_flip").on("click", lightgroupflip);
         $(".api_light_group_dim").on("change", lightgroupdim);
+        $(".api_light_group_color").on("input", lightgroupcolor);
+
+        $(".api_get_scenes").on("click", getscenes);
+        $(".api_save_scene").on("click", savescene);
+        $(".api_set_scene").on("click", setscene);
     };
 
     var get = function on() {
@@ -65,32 +70,6 @@ define(['jquery'], function($) {
             });
     }
 
-//    var lighton = function lighton(e) {
-//        $.ajax({
-//                "url": "/api/hue/lights/" + $(e.target).data("light-id") + "/on",
-//                "type": "POST",
-//            })
-//            .done(function(data) {
-//                console.log(data);
-//            })
-//            .fail(function(jqXHR, status, err) {
-//                console.log(err);
-//            });
-//    }
-//
-//    var lightoff = function lightoff(e) {
-//        $.ajax({
-//                "url": "/api/hue/lights/" + $(e.target).data("light-id") + "/off",
-//                "type": "POST",
-//            })
-//            .done(function(data) {
-//                console.log(data);
-//            })
-//            .fail(function(jqXHR, status, err) {
-//                console.log(err);
-//            });
-//    }
-
     var lightflip = function lightflip(e) {
         var light_id = $(e.target).data("light-id");
         $.ajax({
@@ -99,7 +78,7 @@ define(['jquery'], function($) {
         })
             .done(function(results) {
                 console.log(results);
-                $(".light_" + light_id).html(results.data.device.state.on ? "O" : "X");
+                $(".light_" + light_id).find(".api_light_flip").html(results.data.device.state.on ? "O" : "X");
             })
             .fail(function(jqXHR, status, err) {
                 console.log(err);
@@ -125,6 +104,25 @@ define(['jquery'], function($) {
             });
     }
 
+    var lightcolor = function lightcolor(e) {
+        var light_id = $(e.target).data("light-id");
+        var val = $(e.target).val();
+
+        $.ajax({
+            "url": "/api/hue/lights/" + light_id + "/color",
+            "type": "POST",
+            "data": {
+                "color": val
+            }
+        })
+            .done(function(results) {
+                console.log(results);
+            })
+            .fail(function(jqXHR, status, err) {
+                console.log(err);
+            });
+    }
+
     var lightgroupflip = function lightgroupflip(e) {
         var light_group_id = $(e.target).data("light-group-id");
         $.ajax({
@@ -133,7 +131,7 @@ define(['jquery'], function($) {
         })
             .done(function(results) {
                 console.log(results);
-                $(".light_group_" + light_group_id).html(results.data.device.state === 1 ? "O" : "X");
+                $(".light_group_" + light_group_id).find(".api_light_group_flip").html(results.data.device.state === 1 ? "O" : "X");
             })
             .fail(function(jqXHR, status, err) {
                 console.log(err);
@@ -153,6 +151,67 @@ define(['jquery'], function($) {
         })
             .done(function(results) {
                 console.log(results);
+            })
+            .fail(function(jqXHR, status, err) {
+                console.log(err);
+            });
+    }
+
+    var lightgroupcolor = function lightgroupcolor(e) {
+        var light_group_id = $(e.target).data("light-group-id");
+        var val = $(e.target).val();
+
+        $.ajax({
+            "url": "/api/hue/groups/" + light_group_id + "/color",
+            "type": "POST",
+            "data": {
+                "color": val
+            }
+        })
+            .done(function(results) {
+                console.log(results);
+            })
+            .fail(function(jqXHR, status, err) {
+                console.log(err);
+            });
+    }
+
+    var getscenes = function getscenes() {
+        $.ajax({
+            "url": "/api/hue/scenes",
+            "type": "GET"
+        })
+            .done(function(data) {
+                console.log(data);
+            })
+            .fail(function(jqXHR, status, err) {
+                console.log(err);
+            });
+    }
+
+    var savescene = function savescene() {
+        $.ajax({
+            "url": "/api/hue/scenes",
+            "type": "POST",
+            "data": {
+                "name": $(".api_scene_name").val()
+            }
+        })
+            .done(function(data) {
+                console.log(data);
+            })
+            .fail(function(jqXHR, status, err) {
+                console.log(err);
+            });
+    }
+
+    var setscene = function setscene() {
+        $.ajax({
+            "url": "/api/hue/scenes/" + $(".api_scene_name").val() + "/on",
+            "type": "POST"
+        })
+            .done(function(data) {
+                console.log(data);
             })
             .fail(function(jqXHR, status, err) {
                 console.log(err);

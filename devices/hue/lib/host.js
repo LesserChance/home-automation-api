@@ -2,6 +2,7 @@
 var util          = require('util');
 var eventEmitter  = require('events').EventEmitter;
 var hue           = require('node-hue-api');
+var Q             = require('q');
 
 // App Modules
 var DeviceList    = require("../../../util/device_list");
@@ -76,6 +77,22 @@ HueHost.prototype.getLight = function getLight(device_id) {
 
 HueHost.prototype.getLightGroup = function getLightGroup(device_id) {
     return this.light_group_list.get(device_id);
+};
+
+HueHost.prototype.getScenes = function getScenes() {
+    return this.performRequest("/scenes", "GET");
+};
+
+HueHost.prototype.saveScene = function saveScene(name) {
+    return this.performRequest("/scenes/" + name, "PUT",
+        {
+            "name": name,
+            "lights": this.light_list.getAllIds()
+        });
+};
+
+HueHost.prototype.loadScene = function loadScene(req) {
+    return this.getLightGroup(0).setScene(req.light_scene_id);
 };
 
 HueHost.prototype.increasePollRate = function increasePollRate() {

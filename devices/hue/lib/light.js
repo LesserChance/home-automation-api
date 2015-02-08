@@ -35,6 +35,40 @@ HueLight.prototype.constants = {
 };
 
 /**
+ * Get the full state of this device
+ * @returns {Promise}
+ */
+HueLight.prototype.getFullState = function getFullState() {
+    return require("./host")
+        .performRequest(this.getDeviceUrl(), "GET")
+        .then(function(data) {
+            return data.state;
+        });
+};
+
+/**
+ * Set this device to a new state for a specific duration, then go back to what it was
+ * @param {Object} new_state - object representing the new state
+ * @param {Number} duration - the length of the new state
+ * @returns {Promise}
+ */
+HueLight.prototype.setTemporaryState = function setTemporaryState(new_state, duration) {
+    return this.getFullState()
+        .then(function(previous_state) {
+            //set the new state
+            new_state.transitiontime = this.transition_time;
+            previous_state.transitiontime = this.transition_time;
+
+            return this.setState(new_state)
+                .then(function() {
+                    setTimeout(function() {
+                        return this.setState(previous_state);
+                    }.bind(this), duration);
+                }.bind(this));
+        }.bind(this));
+};
+
+/**
  * Check to see if this new state (pulled from the bridge) is different then the current
  * @return boolean - true if the state has changed
  */
@@ -62,9 +96,6 @@ HueLight.prototype.handleNewState = function handleNewState(new_state) {
  * The device has retrieved it's initial state
  */
 var init = function init(data) {
-//    console.debug(data);
-//    console.debug("------------");
-
     this.state = data.state;
     this.model_id = data.modelId;
     this.loaded = true;

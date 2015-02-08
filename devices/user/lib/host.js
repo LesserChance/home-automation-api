@@ -3,6 +3,7 @@ var util         = require('util');
 var eventEmitter = require('events').EventEmitter;
 
 // App Modules
+var hue          = require("../../../devices/hue");
 var DeviceList   = require("../../../util/device_list");
 var config       = require("../../../util/config.js");
 
@@ -36,6 +37,25 @@ UserHost.prototype.init = function init() {
 
 UserHost.prototype.getUser = function getUser(user_name) {
     return this.user_list.getNamedDevice(user_name);
+};
+
+UserHost.prototype.handleLocationChange = function handleLocationChange(user, event, data) {
+    var other_user = this.getUser("ryan");
+
+    if (user == other_user) {
+        other_user = this.getUser("meredith");
+    }
+
+    if (user.get("location") == LOCATION.HOME) {
+        if (other_user.get("location") != LOCATION.HOME) {
+            // The other user is not home, set the lights up
+            var living_room_lights = hue.host.getLightGroup(0);
+            living_room_lights.setScene(user.get("home_light_preference"));
+        } else {
+            // The other user is home, blink the lights to notify that user is close
+
+        }
+    }
 };
 
 module.exports = new UserHost();

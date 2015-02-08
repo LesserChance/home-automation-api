@@ -5,7 +5,7 @@ var Q            = require('q');
 var hue          = require('node-hue-api');
 
 // App Modules
-var DeviceList    = require("../../../util/device_list");
+var DeviceList   = require("../../../util/device_list");
 
 // Local Modules
 var HueDevice    = require("./device");
@@ -41,6 +41,40 @@ HueLightGroup.prototype.constants = {
 };
 
 /***************************************
+ * SCENE CHANGES                       *
+ ***************************************/
+/**
+ * Set this device to a new state for a specific duration, then go back to what it was
+ * @param {Object} new_state - object representing the new state
+ * @param {Number} duration - the length of the new state
+ * @returns {Promise}
+ */
+HueLightGroup.prototype.setTemporaryState = function setTemporaryState(new_state, duration) {
+    return saveTemporaryScene.call(this)
+        .then(function() {
+            //set the new state
+            new_state.transitiontime = this.transition_time;
+
+            return this.setState(new_state)
+                .then(function() {
+                    setTimeout(function() {
+                        this.setScene(LIGHT_STATE.TEMP_SCENE);
+                    }.bind(this), duration);
+                }.bind(this));
+        }.bind(this));
+};
+
+/**
+ *
+ */
+HueLightGroup.prototype.setScene = function setScene(scene_id) {
+    return this.setNewState(
+        {scene: scene_id},
+        "loading_scene"
+    );
+};
+
+/***************************************
  * STATE CHANGE CALLBACKS              *
  ***************************************/
 /**
@@ -72,6 +106,14 @@ var init = function init(data) {
 
     this.loaded = true;
     this.emit("load");
+};
+
+/**
+ * Get the full state of this device
+ * @returns {Promise}
+ */
+var saveTemporaryScene = function saveTemporaryScene() {
+    return require("./host").saveScene(LIGHT_STATE.TEMP_SCENE);
 };
 
 /**

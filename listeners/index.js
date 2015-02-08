@@ -1,38 +1,28 @@
 // App Modules
-var hue = require("../devices/hue");
-var wemo = require("../devices/wemo");
-var twilio = require("../devices/twilio-phone");
-var user = require("../devices/user");
+var hue          = require("../devices/hue");
+var wemo         = require("../devices/wemo");
+var twilio       = require("../devices/twilio-phone");
+var user         = require("../devices/user");
 
 // App Modules
-var config = require("../util/config.js");
+var config       = require("../util/config.js");
+var Listener     = require("../util/listener.js");
 
 // constants
 var LIGHT_STATE  = require("../constants/light_state");
 var LOCATION     = require("../constants/location");
 
-var logEvent = function logEvent(description) {
-    console.log({
-        "time": (new Date()).toString(),
-        "type": "event",
-        "data": "Event Occurred: " + description
-    });
-};
 
-var addListener = function addListener(device, event, callback, description) {
-    device.on(event, function() {
-        callback(this, arguments);
-        if (description) {
-            logEvent(description);
-        }
-    }.bind(this));
-};
+
+
+
+
+var rgb          = require('node-hue-api/hue-api/rgb');
 
 var startListeners = function startListeners() {
     var living_room_wemo = wemo.host.getDevice("living_room");
     var living_room_lights = hue.host.getLightGroup(0);
     var phone = twilio.host.getPhone(config.device_ids.twilio_phone);
-
     var ryan = user.host.getUser("ryan");
     var meredith = user.host.getUser("meredith");
 
@@ -41,8 +31,14 @@ var startListeners = function startListeners() {
         return;
     }
 
+    var listeners = {
+        "wemo": {},
+        "living_room_lights": {},
+        "users": {}
+    };
+
     // Whenever the living room wemo is turned on, turn on all lights
-    addListener(
+    listeners.wemo.handle_on = new Listener(
         living_room_wemo,
         "on",
         function() {
@@ -52,7 +48,7 @@ var startListeners = function startListeners() {
     );
 
     // Whenever the living room wemo is turned off, turn off all lights
-    addListener(
+    listeners.wemo.handle_off = new Listener(
         living_room_wemo,
         "off",
         function() {
@@ -64,7 +60,7 @@ var startListeners = function startListeners() {
     );
 
     // Whenever the living room lights goes to off or on, the wemo should be set to the proper state
-    addListener(
+    listeners.living_room_lights.handle_change = new Listener(
         living_room_lights,
         "change",
         function(event, data) {
@@ -81,23 +77,60 @@ var startListeners = function startListeners() {
         }
     );
 
-    //people test
-//    console.debug("ryan");
-//    console.debug(ryan);
-//
-//    console.debug("meredith");
-//    console.debug(meredith);
-//
-//    ryan.on("arrived", function(data) {
-//        console.debug("RYAN ARRIVED");
-//        console.debug(data.previous_location);
-//        console.debug(ryan.get("location"));
-//    });
-//
-//    ryan.setLocation(LOCATION.HOME);
-//    setTimeout(function() {
-//        ryan.setLocation(LOCATION.WORK);
-//    }, 5000);
+    listeners.users.ryan_arrived_home = new Listener(
+        ryan,
+        "arrived",
+        function(event, data) {
+            living_room_lights.colorLoop(10000);
+            user.host.handleLocationChange(ryan, event, data);
+        }
+    );
+
+    listeners.users.ryan_left_home = new Listener(
+        ryan,
+        "leaving",
+        function(event, data) {
+            user.host.handleLocationChange(ryan, event, data);
+        }
+    );
+
+    listeners.users.meredith_arrived_home = new Listener(
+        meredith,
+        "arrived",
+        function(event, data) {
+            user.host.handleLocationChange(meredith, event, data);
+        }
+    );
+
+    listeners.users.meredith_left_home = new Listener(
+        meredith,
+        "leaving",
+        function(event, data) {
+            user.host.handleLocationChange(meredith, event, data);
+        }
+    );
+
+    //state test
+//    living_room_lights.light_devices.get("1").color("#FF0000", 5000);
+//    living_room_lights.light_devices.get("2").color("#FF0000", 5500);
+//    living_room_lights.light_devices.get("3").color("#FF0000", 6000);
+//    living_room_lights.light_devices.get("4").color("#FF0000", 6500);
+//    living_room_lights.light_devices.get("5").color("#FF0000", 7000);
+//    living_room_lights.light_devices.get("6").color("#FF0000", 7500);
+
+//    living_room_lights.light_devices.get("1").setTemporaryState(
+//        {
+//            "xy": rgb.convertRGBtoXY([255,0,0], {modelId: this.model_id})
+//        },
+//        10000
+//    );
+
+//    living_room_lights.setTemporaryState(
+//        {
+//            "xy": rgb.convertRGBtoXY([255,0,0], {modelId: this.model_id})
+//        },
+//        10000
+//    );
 
     //color test
 //    living_room_lights.setTransitionTime(100);
@@ -120,6 +153,7 @@ module.exports =  {
         hue.host.on("ready", function() {
             startListeners();
             console.debug("Listeners Ready");
+            console.log("---------------------------------------");
         });
     }
 };

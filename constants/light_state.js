@@ -4,5 +4,7 @@ module.exports = {
     GROUP_DIFF: 2,
 
     LIGHT_OFF: false,
-    LIGHT_ON: true
+    LIGHT_ON: true,
+
+    TEMP_SCENE: "tempscene"
 };

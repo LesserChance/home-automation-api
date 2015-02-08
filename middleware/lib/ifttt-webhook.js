@@ -4,6 +4,9 @@ var webhook = require('express-ifttt-webhook');
 // App Modules
 var config  = require("../../util/config.js");
 
+// Local Modules
+var ifttt   = require("./api/ifttt.js");
+
 module.exports = {
     init: function(app) {
         app.use(webhook(
@@ -12,22 +15,15 @@ module.exports = {
 
                 return done(null, ifttt_user);
             },
-            function(json, done) {
+            function(body, done) {
+                var data = body.description.data;
                 console.debug("webhook");
-                console.debug(json);
-
-                //todo: route to the ifttt api
-//            // transform data
-//            var out = getOutputObjectFromInput(json);
-//
-//            // specify URL to forward your transformed data to
-//            out.url = 'http://api.example.org';
-//
-//            done(null, out);
-
-
-
-            done();
-        }));
+                console.debug((new Date()).toString());
+                console.debug(data);
+                console.debug("--------");
+                ifttt.handleEvent(data);
+                done();
+            })
+        );
     }
 };

@@ -5,10 +5,10 @@ var hue = require("../../../devices/hue");
 var api;
 
 var sendDeviceResponse = function sendDeviceResponse(req, res) {
-  if (req.timedout) return;
-  api.success(res, {
-    device: req.device.toJson()
-  });
+    if (req.timedout) return;
+    api.success(res, {
+        device: req.device.toJson()
+    });
 };
 
 module.exports = {
@@ -37,6 +37,11 @@ module.exports = {
             }
         });
 
+        api.request_router.param(":light_scene_id", function (req, res, next, id) {
+            req.light_scene_id = id;
+            next();
+        });
+
         /*************************************
          * LIGHTS                            *
          *************************************/
@@ -48,22 +53,27 @@ module.exports = {
         // On
         api.request_router
             .route('/hue/lights/:light_id/on')
-            .post(performPromise(hue.light.prototype.setOn));
+            .post(performDevicePromise(hue.light.prototype.setOn));
 
         // Off
         api.request_router
             .route('/hue/lights/:light_id/off')
-            .post(performPromise(hue.light.prototype.setOff));
+            .post(performDevicePromise(hue.light.prototype.setOff));
 
         // Flip
         api.request_router
             .route('/hue/lights/:light_id/flip')
-            .post(performPromise(hue.light.prototype.flip));
+            .post(performDevicePromise(hue.light.prototype.flip));
 
         // Dim
         api.request_router
             .route('/hue/lights/:light_id/dim')
-            .post(performPromise(hue.light.prototype.dim, "brightness"));
+            .post(performDevicePromise(hue.light.prototype.dim, "brightness"));
+
+        // Color
+        api.request_router
+            .route('/hue/lights/:light_id/color')
+            .post(performDevicePromise(hue.light.prototype.color, "color"));
 
         /*************************************
          * LIGHT GROUPS                      *
@@ -76,49 +86,68 @@ module.exports = {
         // On
         api.request_router
             .route('/hue/groups/:light_group_id/on')
-            .post(performPromise(hue.light_group.prototype.setOn));
+            .post(performDevicePromise(hue.light_group.prototype.setOn));
 
         // Off
         api.request_router
             .route('/hue/groups/:light_group_id/off')
-            .post(performPromise(hue.light_group.prototype.setOff));
+            .post(performDevicePromise(hue.light_group.prototype.setOff));
 
         // Flip
         api.request_router
             .route('/hue/groups/:light_group_id/flip')
-            .post(performPromise(hue.light_group.prototype.flip));
+            .post(performDevicePromise(hue.light_group.prototype.flip));
 
         // Dim
         api.request_router
             .route('/hue/groups/:light_group_id/dim')
-            .post(performPromise(hue.light_group.prototype.dim, "brightness"));
+            .post(performDevicePromise(hue.light_group.prototype.dim, "brightness"));
 
-//        /*************************************
-//         * LIGHT SCENES                      *
-//         *************************************/
-//        // Get
-//        api.request_router
-//            .route('/hue/scenes/:light_scene_id')
-//            .get(sendDeviceResponse);
-//
-//        // Create
-//        api.request_router
-//            .route('/hue/scenes')
-//            .post(performPromise(hue.light_scene.prototype.create));
-//
-//        // Update
-//        api.request_router
-//            .route('/hue/scenes/:light_scene_id')
-//            .put(performPromise(hue.light_scene.prototype.update));
-//
-//        // On
-//        api.request_router
-//            .route('/hue/scenes/:light_scene_id/on')
-//            .post(performPromise(hue.light_scene.prototype.setOn));
+        // Color
+        api.request_router
+            .route('/hue/groups/:light_group_id/color')
+            .post(performDevicePromise(hue.light_group.prototype.color, "color"));
+
+        /*************************************
+         * LIGHT SCENES                      *
+         *************************************/
+        // Get
+        api.request_router
+            .route('/hue/scenes')
+            .get(performPromise(hue.host, hue.host.getScenes));
+
+        // Create
+        api.request_router
+            .route('/hue/scenes')
+            .post(performPromise(hue.host, hue.host.saveScene, "name"));
+
+        // On
+        api.request_router
+            .route('/hue/scenes/:light_scene_id/on')
+            .post(performPromise(hue.host, hue.host.loadScene));
    }
 };
 
-var performPromise = function performPromise(method) {
+var performPromise = function performPromise(caller, method) {
+    var call_args = Array.prototype.slice.call(arguments, 2);
+    return function(req, res, next) {
+        if (req.timedout) return;
+
+        var send_args = [];
+        for (var i = 0, iEnd = call_args.length; i < iEnd; i++) {
+            send_args.push(req.body[call_args[i]]);
+        }
+        send_args.push(req);
+
+        method.apply(caller, send_args)
+            .then(function(data) {
+                api.success(res, data);
+            })
+            .done();
+    }
+};
+
+var performDevicePromise = function performDevicePromise(method) {
     var call_args = Array.prototype.slice.call(arguments, 1);
     return function(req, res, next) {
         var send_args = [];

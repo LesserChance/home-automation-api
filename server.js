@@ -20,6 +20,8 @@ mongoose.connect('mongodb://localhost/lightserver');
 var httpServer = http.createServer(app);
 httpServer.listen(config.port);
 
+console.log("=======================================");
+console.log((new Date()).toString());
 console.log('Server Initialized, port ' + config.port);
 
 // Init Listeners

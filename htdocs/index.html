@@ -2,71 +2,134 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <meta name="viewport" content="width=device-width, user-scalable=no" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
         <title>Lights</title>
         <link rel="stylesheet" href="assets/css/global.css">
     </head>
 
     <body>
-        <input type="button" value="On" id="api_1"><br/>
-        <input type="button" value="Off" id="api_2"><br/>
-        <input type="button" value="Flip" id="api_3"><br/>
-        <input type="button" value="Get" id="api_4"><br/>
+        <h1>All Lights</h1>
+        <div class="container-fluid">
+            <div class="light_group_0 row">
+                <div class="col-md-6 col-xs-12">
+                    <div class="light_5 row">
+                        <div class="col-sm-2 col-xs-2">
+                            <button class="light_group_0 api_light_group_flip btn btn-primary" data-light-group-id="0">O</button>
+                        </div>
+                        <div class="col-sm-6 col-xs-6">
+                            <input type="range" class="api_light_group_dim" min="0" max="255" data-light-group-id="0">
+                        </div>
+                        <div class="col-sm-4 col-xs-4">
+                            <input type="color" class="api_light_group_color" data-light-group-id="0">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-        <br/><br/>
-        Lights<br/>
-        <table border="1">
-            <tr>
-                <td colspan="2" style="text-align:center;">TV</td>
-            </tr>
-            <tr>
-                <td>
-                    <button class="light_3 api_light_flip" data-light-id="3">O</button>
-                    <input type="text" class="api_light_dim" data-light-id="3">
-                </td>
-                <td>
-                    <button class="light_2 api_light_flip" data-light-id="2">O</button>
-                    <input type="text" class="api_light_dim" data-light-id="2">
-                </td>
-            </tr>
-            <tr>
-                <td><button class="light_1 api_light_flip" data-light-id="1">O</button></td>
-                <td><button class="light_6 api_light_flip" data-light-id="6">O</button></td>
-            </tr>
-            <tr>
-                <td><button class="light_5 api_light_flip" data-light-id="5">O</button></td>
-                <td><button class="light_4 api_light_flip" data-light-id="4">O</button></td>
-            </tr>
-            <tr>
-                <td colspan="2" style="text-align:center;">Couch</td>
-            </tr>
-        </table>
+        <h1>Individual Lights</h1>
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-xs-12">
+                    <h3>TV</h3>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xs-6">
+                    <div class="light_5 row">
+                        <div class="col-sm-2 col-xs-12">
+                            <button class="api_light_flip btn btn-primary" data-light-id="5">O</button>
+                        </div>
+                        <div class="col-sm-6 col-xs-6">
+                            <input type="range" class="api_light_dim" min="0" max="255" data-light-id="5">
+                        </div>
+                        <div class="col-sm-4 col-xs-6">
+                            <input type="color" class="api_light_color" data-light-id="5">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xs-6">
+                    <div class="light_4 row">
+                        <div class="col-sm-2 col-xs-12">
+                            <button class="api_light_flip btn btn-primary" data-light-id="4">O</button>
+                        </div>
+                        <div class="col-sm-6 col-xs-6">
+                            <input type="range" class="api_light_dim" min="0" max="255" data-light-id="4">
+                        </div>
+                        <div class="col-sm-4 col-xs-6">
+                            <input type="color" class="api_light_color" data-light-id="4">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xs-6">
+                    <div class="light_1 row">
+                        <div class="col-sm-2 col-xs-12">
+                            <button class="api_light_flip btn btn-primary" data-light-id="1">O</button>
+                        </div>
+                        <div class="col-sm-6 col-xs-6">
+                            <input type="range" class="api_light_dim" min="0" max="255" data-light-id="1">
+                        </div>
+                        <div class="col-sm-4 col-xs-6">
+                            <input type="color" class="api_light_color" data-light-id="1">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xs-6">
+                    <div class="light_6 row">
+                        <div class="col-sm-2 col-xs-12">
+                            <button class="api_light_flip btn btn-primary" data-light-id="6">O</button>
+                        </div>
+                        <div class="col-sm-6 col-xs-6">
+                            <input type="range" class="api_light_dim" min="0" max="255" data-light-id="6">
+                        </div>
+                        <div class="col-sm-4 col-xs-6">
+                            <input type="color" class="api_light_color" data-light-id="6">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xs-6">
+                    <div class="light_2 row">
+                        <div class="col-sm-2 col-xs-12">
+                            <button class="api_light_flip btn btn-primary" data-light-id="2">O</button>
+                        </div>
+                        <div class="col-sm-6 col-xs-6">
+                            <input type="range" class="api_light_dim" min="0" max="255" data-light-id="2">
+                        </div>
+                        <div class="col-sm-4 col-xs-6">
+                            <input type="color" class="api_light_color" data-light-id="2">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xs-6">
+                    <div class="light_3 row">
+                        <div class="col-sm-2 col-xs-12">
+                            <button class="api_light_flip btn btn-primary" data-light-id="3">O</button>
+                        </div>
+                        <div class="col-sm-6 col-xs-6">
+                            <input type="range" class="api_light_dim" min="0" max="255" data-light-id="3">
+                        </div>
+                        <div class="col-sm-4 col-xs-6">
+                            <input type="color" class="api_light_color" data-light-id="3">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xs-12">
+                    <h3>Couch</h3>
+                </div>
+            </div>
+        </div>
 
-        <br/><br/>
-        Groups<br/>
-        <button class="light_group_0 api_light_group_flip" data-light-group-id="0">O</button>
-        <input type="text" class="api_light_group_dim" data-light-group-id="0">
-        <table border="1">
-            <tr>
-                <td colspan="2" style="text-align:center;">TV</td>
-            </tr>
-            <tr>
-                <td><button class="light_group_2 api_light_group_flip" data-light-group-id="2">O</button></td>
-                <td><input type="text" class="api_light_group_dim" data-light-group-id="2"></td>
-            </tr>
-            <tr>
-                <td><button class="light_group_3 api_light_group_flip" data-light-group-id="3">O</button></td>
-                <td><input type="text" class="api_light_group_dim" data-light-group-id="3"></td>
-            </tr>
-            <tr>
-                <td><button class="light_group_1 api_light_group_flip" data-light-group-id="1">O</button></td>
-                <td><input type="text" class="api_light_group_dim" data-light-group-id="1"></td>
-            </tr>
-            <tr>
-                <td colspan="2" style="text-align:center;">Couch</td>
-            </tr>
-        </table>
+        <h1>Scenes</h1>
+        <input type="text" class="api_scene_name"><br/>
+        <input type="button" value="GET SCENES" class="api_get_scenes btn btn-primary">
+        <input type="button" value="SAVE SCENE" class="api_save_scene btn btn-primary">
+        <input type="button" value="TURN ON SCENE" class="api_set_scene btn btn-primary">
 
         <script src="assets/scripts/lib/require.js"></script>
         <script src="assets/scripts/common.js"></script>

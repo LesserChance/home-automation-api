@@ -29,6 +29,14 @@ HueDevice.prototype.emits = function emits(events, args) {
 };
 
 /**
+ * return the url used to retrieve this devices state
+ * @returns String
+ */
+HueDevice.prototype.getDeviceUrl = function getDeviceUrl() {
+    return this.api_path + this.id ;
+};
+
+/**
  * return the url used to update this devices state
  * @returns String
  */
@@ -107,7 +115,6 @@ HueDevice.prototype.flip = function flip() {
 };
 
 /**
- * Protected
  * Callback after a new state occurs - used for implementation in child class
  * @param transition_time - time in ms
  */
@@ -121,10 +128,13 @@ HueDevice.prototype.setTransitionTime = function setTransitionTime(transition_ti
 /**
  * Dim the device
  */
-HueDevice.prototype.dim = function dim(brightness) {
-    return this.setNewState(
-        {"bri": parseInt(brightness, 10)},
-        'dimming'
+HueDevice.prototype.dim = function dim(brightness, duration) {
+    return this.setPermanentOrTempState(
+        {
+            "bri": parseInt(brightness, 10)
+        },
+        'dimming',
+        duration
     );
 };
 
@@ -144,12 +154,13 @@ HueDevice.prototype.colorLoop = function colorLoop(length) {
 /**
  * Set the device color
  */
-HueDevice.prototype.color = function dim(hex) {
-    return this.setNewState(
+HueDevice.prototype.color = function color(hex, duration) {
+    return this.setPermanentOrTempState(
         {
             "xy": rgb.convertRGBtoXY(hexToRgb(hex), {modelId: this.model_id})
         },
-        'setting_color'
+        'setting_color',
+        duration
     );
 };
 
@@ -196,11 +207,35 @@ HueDevice.prototype.setNewState = function setNewState(new_state, emit_event) {
 
     new_state.transitiontime = this.transition_time;
 
-    return require("./host")
-        .performRequest(this.getActionUrl(), "PUT", new_state)
+    return this.setState(new_state)
         .then(function() {
             callback(emit_event, new_state)
         });
+};
+
+/**
+ * Perform the hue api request to set a state
+ * @param {Object} new_state - object representing the new state
+ * @returns {Promise}
+ */
+HueDevice.prototype.setState = function setState(new_state) {
+    return require("./host")
+        .performRequest(this.getActionUrl(), "PUT", new_state)
+};
+
+/**
+ * If duration is non-null only set the state temporarily
+ * @param {Object} new_state - object representing the new state
+ * @param {String} emit_event - the events to emit before the new state occurs
+ * @param {Number} duration - the length of the new state
+ * @returns {Promise}
+ */
+HueDevice.prototype.setPermanentOrTempState = function setPermanentOrTempState(new_state, emit_event, duration) {
+    if (duration != null) {
+        return this.setTemporaryState(new_state, duration)
+    } else {
+        return this.setNewState(new_state, emit_event);
+    }
 };
 
 /***************************************
@@ -224,6 +259,10 @@ var handleFinishedState = function handleFinishedState(event, new_state) {
 
         case "starting_effect":
             this.emit(new_state.effect !== "none" ? 'effect_start' : 'effect_end', {state: new_state});
+            break;
+
+        case "loading_scene":
+            this.emit("loaded_scene", {state: new_state});
             break;
     }
 
@@ -251,6 +290,17 @@ var handleFinishedStateFromOff = function handleFinishedStateFromOff(event, new_
  * @param new_state
  */
 HueDevice.prototype.handleStateEventEnd = function handleStateEventEnd(event, new_state) {
+    // implement in child class
+};
+
+/**
+ * Protected
+ * Set this device to a new state for a specific duration, then go back to what it was
+ * @param {Object} new_state - object representing the new state
+ * @param {Number} duration - the length of the new state
+ * @returns {Promise}
+ */
+HueDevice.prototype.setTemporaryState = function setTemporaryState(new_state, duration) {
     // implement in child class
 };
 
