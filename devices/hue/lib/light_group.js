@@ -67,11 +67,30 @@ HueLightGroup.prototype.setTemporaryState = function setTemporaryState(new_state
 /**
  *
  */
-HueLightGroup.prototype.setScene = function setScene(scene_id) {
-    return this.setNewState(
-        {scene: scene_id},
-        "loading_scene"
-    );
+HueLightGroup.prototype.setScene = function setScene(scene_id, duration) {
+    if (duration != null) {
+        return this.setTemporaryScene(scene_id);
+    } else {
+        return this.setNewState(
+            {scene: scene_id},
+            "loading_scene"
+        );
+    }
+};
+
+/**
+ *
+ */
+HueLightGroup.prototype.setTemporaryScene = function setTemporaryScene(scene_id, duration) {
+    return saveTemporaryScene.call(this)
+        .then(function() {
+            return this.setScene(scene_id)
+                .then(function() {
+                    setTimeout(function() {
+                        this.setScene(LIGHT_STATE.TEMP_SCENE);
+                    }.bind(this), duration);
+                }.bind(this));
+        }.bind(this));
 };
 
 /***************************************

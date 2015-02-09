@@ -20,9 +20,7 @@ util.inherits(User, eventEmitter);
  * Public Methods                        *
  *****************************************/
 User.prototype.setLocation = function setLocation(new_location) {
-    console.debug("setLocation");
     if (this.data.location != new_location) {
-        console.debug("switch");
         var previous_location = this.data.location;
 
         // Update the model

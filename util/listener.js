@@ -5,30 +5,46 @@ var util         = require('util');
 // App Modules
 var config       = require("./config.js");
 
-var Listener = function Listener(device, event, callback, description) {
+var Listener = function Listener(device, event, callback) {
     this.enabled = true;
 
     device.on(event, function() {
         if (this.enabled) {
-        callback.apply(null, arguments);
-            if (description) {
-                logEvent(description);
+            var response = callback.apply(null, arguments);
+            if (response) {
+                logEvent(response);
             }
         }
     }.bind(this));
 };
 
-var logEvent = function logEvent(description) {
-    console.log({
+var logEvent = function logEvent(response) {
+    var log = {
         "time": (new Date()).toString(),
         "type": "event",
-        "data": "Event Occurred: " + description
-    });
+        "status": response.status
+    };
+
+    switch (response.status) {
+        case "ERROR":
+            log.error_code = response.code;
+            log.details = "Event Failed: " + response.description;
+            break;
+
+        case "SUCCESS":
+            log.details = "Event Occurred: " + response.description;
+            break;
+    }
+
+    if (response.data) {
+        log.data = response.data;
+    }
+
+    console.log(log);
 };
 
 Listener.prototype = {
     disable: function disable() {
-        console.debug("disable");
         this.enabled = false;
     },
 
@@ -38,9 +54,25 @@ Listener.prototype = {
     },
 
     enable: function enable() {
-        console.debug("enable");
         this.enabled = false;
     }
 };
 
-module.exports = Listener;
+module.exports = {
+    "listener": Listener,
+    "success": function (description, data) {
+        return {
+            "status": "SUCCESS",
+            "description": description,
+            "data": data
+        }
+    },
+    "error": function (description, data, code) {
+        return {
+            "status": "ERROR",
+            "code": code,
+            "description": description,
+            "data": data
+        }
+    }
+};
