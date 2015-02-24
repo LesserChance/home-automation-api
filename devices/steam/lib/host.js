@@ -65,10 +65,6 @@ SteamHost.prototype.getFriendStatus = function getFriendStatus() {
                             friend_was_online[friend.steamid] = false;
                             this.emit("friend_signed_off", {friend: friend});
                         }
-
-                        if (friend.personaname == "Jasarec") {
-                            this.emit("friend_signed_on", {friend: friend});
-                        }
                     }
                 }
             }
