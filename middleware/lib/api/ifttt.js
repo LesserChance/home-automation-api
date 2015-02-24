@@ -26,14 +26,11 @@ module.exports = {
     handleUserLocationChange: function handleUserLocationChange(data) {
         var person = user.host.getUser(data.user);
 
-        console.debug(person);
         switch (data.action) {
             case IFTTT_EVENT.ENTERED:
-                console.debug("a");
                 person.setLocation(data.location);
                 break;
             case IFTTT_EVENT.EXITED:
-                console.debug("b");
                 person.setLocation(LOCATION.TRANSIT);
                 break;
         }

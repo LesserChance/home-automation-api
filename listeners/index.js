@@ -3,6 +3,7 @@ var hue          = require("../devices/hue");
 var wemo         = require("../devices/wemo");
 var twilio       = require("../devices/twilio-phone");
 var user         = require("../devices/user");
+var steam        = require("../devices/steam");
 
 // App Modules
 var config       = require("../util/config.js");
@@ -18,6 +19,7 @@ var startListeners = function startListeners() {
     var phone = twilio.host.getPhone(config.device_ids.twilio_phone);
     var ryan = user.host.getUser("ryan");
     var meredith = user.host.getUser("meredith");
+    var steam_listener = steam.host;
 
     if (!living_room_wemo || !phone) {
         setTimeout(startListeners, 2000);
@@ -27,13 +29,17 @@ var startListeners = function startListeners() {
     var listeners = {
         "wemo": {},
         "living_room_lights": {},
-        "users": {}
+        "users": {},
+        "steam": {}
     };
 
     listeners.wemo.handle_on = new Listener.listener(
         living_room_wemo,
         "on",
         function() {
+            // dont trigger the wemo response when we turn it on
+            listeners.living_room_lights.handle_change.disableFor(5000);
+
             living_room_lights.setOn();
             return Listener.success("Living Room Wemo turned on all lights");
         }
@@ -44,6 +50,9 @@ var startListeners = function startListeners() {
         "off",
         function() {
             if (living_room_lights.state.on !== 0) {
+                // dont trigger the wemo response when we turn it off
+                listeners.living_room_lights.handle_change.disableFor(5000);
+
                 living_room_lights.setOff();
                 return Listener.success("Living Room Wemo turned off all lights");
             }
@@ -97,6 +106,24 @@ var startListeners = function startListeners() {
         "leaving",
         function(data) {
             return user.host.handleLocationChange(meredith, data);
+        }
+    );
+
+    listeners.steam.friend_signed_on = new Listener.listener(
+        steam_listener,
+        "friend_signed_on",
+        function(data) {
+            if (config.steam_users_to_notify.indexOf(data.friend.personaname) > -1) {
+                if (ryan.get("location") === LOCATION.HOME) {
+                    //flash the lights blue
+                    living_room_lights.color("#0000FF", 5000);
+                }
+
+                //text ryan (for testing)
+                phone.sendSMS(ryan.get("phone_number"), data.friend.personaname + " signed on");
+
+                return Listener.success("Friend signed onto steam, signaled lights and text", {"friend":data.friend.personaname});
+            }
         }
     );
 };

@@ -54,7 +54,7 @@ Listener.prototype = {
     },
 
     enable: function enable() {
-        this.enabled = false;
+        this.enabled = true;
     }
 };
 
