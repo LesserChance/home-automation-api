@@ -36,8 +36,8 @@ SteamHost.prototype.getFriendList = function getFriendList() {
                     friend_was_online[data.friendslist.friends[i].steamid] = null;
                 }
 
-                // check every 5 minutes
-                setInterval(this.getFriendStatus.bind(this), 10000);//5 * 60000);
+                // check every 2 minutes
+                setInterval(this.getFriendStatus.bind(this), 2 * 60000);
             }
         }.bind(this));
 };

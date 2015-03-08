@@ -44,6 +44,7 @@ var self = module.exports = {
         require('./api/hue').initialize(self);
         require('./api/twilio').initialize(self);
         require('./api/ifttt').initialize(self);
+        require('./api/mediapc').initialize(self);
 
         // Register routes
         app.use('/api', self.request_router);

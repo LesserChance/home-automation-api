@@ -10,6 +10,9 @@ module.exports = function (req, res, next) {
     if (req.path.indexOf("/xmlrpc.php") > -1) {
         // IFTTT passthru
         next();
+    } else if (req.path.indexOf("/mediapc") > -1) {
+        // mediapc passthru (for now)
+        next();
     } else if (req.path.indexOf("/twilio/") > -1) {
         // Twilio Endpoint
         auth.connect(

@@ -37,7 +37,14 @@ var request = function request(host, path, method, data, auth, query_format, as_
             response_body += chunk;
         });
         res.on('end', function () {
-            deferred.resolve(JSON.parse(response_body));
+            try {
+                deferred.resolve(JSON.parse(response_body));
+            } catch (e) {
+                console.debug("INVALID JSON RETURNED");
+                console.debug(host, path, method, string_data);
+                console.debug(response_body);
+                console.debug("---------------------");
+            }
         });
     });
 
