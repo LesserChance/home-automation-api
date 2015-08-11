@@ -1,18 +1,22 @@
 // External Modules
-var express = require('express');
-var auth    = require('http-auth');
+var auth         = require('http-auth');
+var cookieParser = require('cookie-parser');
 
 // App Modules
-var config  = require("../../util/config.js");
+var user         = require("../../devices/user");
+var config       = require("../../util/config.js");
 
 module.exports = function (req, res, next) {
     // Special Auth
-    if (req.path.indexOf("/xmlrpc.php") > -1) {
-        // IFTTT passthru
-        next();
-    } else if (req.path.indexOf("/mediapc") > -1) {
+    if (req.path.indexOf("/mediapc") > -1) {
         // mediapc passthru (for now)
         next();
+    } else if (req.path.indexOf("/tasker") > -1) {
+        //match the key
+        //todo: move key to the user db, check that this is in users
+        if (req.get('user-agent') === config.ryan_tasker_key) {
+            next();
+        }
     } else if (req.path.indexOf("/twilio/") > -1) {
         // Twilio Endpoint
         auth.connect(
@@ -25,11 +29,22 @@ module.exports = function (req, res, next) {
                 }
             ))(req, res, next);
     } else {
-        // Normal Auth
+        // Static assets
+        // Check for cookie existence
+        var session_cookie = req.cookies[config.cookie_name];
+        if (session_cookie === config.cookie_secret) {
+            next();
+            return;
+        }
+
+        // Use http auth
         auth.connect(
             auth.basic({
                     realm: "Bateman House"
                 }, function (username, password, callback) {
+                    // Store the login cookie
+                    res.cookie(config.cookie_name, config.cookie_secret, {});
+
                     var static_user = (username === config.username && password === config.password);
                     callback(static_user);
                 }

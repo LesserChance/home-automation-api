@@ -1,12 +1,16 @@
 // External Modules
-var express = require('express');
-var auth    = require('http-auth');
+var express      = require('express');
+var auth         = require('http-auth');
+var cookieParser = require('cookie-parser');
 
 // App Modules
 var config  = require("../util/config.js");
 
 module.exports = {
     initialize: function initialize(app) {
+        // Allow cookie read/writes
+        app.use(cookieParser());
+
         // Authenticate all requests
         app.use("/", require("./lib/auth.js"));
 
@@ -15,8 +19,5 @@ module.exports = {
 
         // Serve API
         require("./lib/api").init(app);
-
-        // Handle IFTTT calls
-        require("./lib/ifttt-webhook").init(app);
     }
 };

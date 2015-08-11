@@ -51,15 +51,15 @@ UserHost.prototype.handleLocationChange = function handleLocationChange(user, ev
         var living_room_lights = hue.host.getLightGroup(0);
         var user_scene = user.get("home_light_preference");
 
-//        if (other_user.get("location") != LOCATION.HOME || user == this.getUser("ryan")) {
+        if (other_user.get("location") != LOCATION.HOME || user == this.getUser("ryan")) {
             // The other user is not home, set the lights up
             living_room_lights.setScene(user_scene);
             return Listener.success("User arrived home, set permanent scene", {"scene":user_scene});
-//        } else {
-//            // The other user is home, blink the lights to notify that user is close
-//            living_room_lights.setScene(user_scene, 3000);
-//            return Listener.success("User arrived home, set temporary scene", {"scene":user_scene});
-//        }
+        } else {
+            // The other user is home, blink the lights to notify that user is close
+            living_room_lights.setScene(user_scene, 3000);
+            return Listener.success("User arrived home, set temporary scene", {"scene":user_scene});
+        }
     }
 
     return null;

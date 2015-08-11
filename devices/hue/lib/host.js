@@ -18,7 +18,7 @@ var api;
 var bridge;
 var base_url = "/api/" + config.hue_username;
 
-var fast_poll = 500;
+var fast_poll = 1000;
 var slow_poll = 10000;
 var decrease_poll_time = 20000;
 

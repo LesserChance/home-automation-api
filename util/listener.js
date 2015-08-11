@@ -60,6 +60,7 @@ Listener.prototype = {
 
 module.exports = {
     "listener": Listener,
+    "log": logEvent,
     "success": function (description, data) {
         return {
             "status": "SUCCESS",

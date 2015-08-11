@@ -1,0 +1,1 @@
+Listeners are the objects that respond to events being emitted

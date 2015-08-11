@@ -4,8 +4,6 @@ var wemo         = require("../devices/wemo");
 var twilio       = require("../devices/twilio-phone");
 var user         = require("../devices/user");
 var steam        = require("../devices/steam");
-
-// App Modules
 var config       = require("../util/config.js");
 var Listener     = require("../util/listener.js");
 
@@ -114,13 +112,13 @@ var startListeners = function startListeners() {
         "friend_signed_on",
         function(data) {
             if (config.steam_users_to_notify.indexOf(data.friend.personaname) > -1) {
-                if (ryan.get("location") === LOCATION.HOME) {
+                if (ryan.get("location") === LOCATION.HOME && living_room_wemo.state.on) {
                     //flash the lights blue
                     living_room_lights.color("#0000FF", 5000);
-                }
 
-                //text ryan (for testing)
-                phone.sendSMS(ryan.get("phone_number"), data.friend.personaname + " signed on");
+                    //text ryan
+                    phone.sendSMS(ryan.get("phone_number"), data.friend.personaname + " signed on");
+                }
 
                 return Listener.success("Friend signed onto steam, signaled lights and text", {"friend":data.friend.personaname});
             }

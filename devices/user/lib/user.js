@@ -40,6 +40,10 @@ User.prototype.setLocation = function setLocation(new_location) {
     }
 };
 
+User.prototype.emitPhoneEvent = function emitPhoneEvent(event, data) {
+    this.emit(event, data);
+};
+
 User.prototype.get = function(key) {
     return this.data[key];
 };
