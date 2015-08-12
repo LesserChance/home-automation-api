@@ -1,5 +1,4 @@
 // External Modules
-var eventEmitter = require('events').EventEmitter;
 var util         = require('util');
 var Q            = require('q');
 var hue          = require('node-hue-api');
@@ -9,6 +8,7 @@ var DeviceList   = require("../../../util/device_list");
 
 // Local Modules
 var HueDevice    = require("./device");
+var HueEvents    = require("./events");
 
 // constants
 var LIGHT_STATE  = require("../../../constants/light_state");
@@ -28,7 +28,7 @@ function HueLightGroup(data) {
     this.loaded = false;
     this.state = {"on":null};
 
-    this.light_devices.onDeviceEvent("change", handleNewLightState.bind(this));
+    this.light_devices.onDeviceEvent(HueEvents.state_change, handleNewLightState.bind(this));
 
     // Retrieve the current light status
     init.call(this, data);
@@ -73,7 +73,7 @@ HueLightGroup.prototype.setScene = function setScene(scene_id, duration) {
     } else {
         return this.setNewState(
             {scene: scene_id},
-            "loading_scene"
+            HueEvents.loading_scene
         );
     }
 };
@@ -124,7 +124,7 @@ var init = function init(data) {
     this.model_id = light.modelId;
 
     this.loaded = true;
-    this.emit("load");
+    this.emit(HueEvents.load);
 };
 
 /**
@@ -184,11 +184,11 @@ var handleNewLightState = function handleNewLightState() {
         var previous_state = this.state.on;
         this.state.on = new_state;
         if (new_state === LIGHT_STATE.GROUP_ON) {
-            this.emits(['on', 'change'], {"previous_state": previous_state});
+            this.emits([HueEvents.on, HueEvents.state_change], {"previous_state": previous_state});
         } else if (new_state === LIGHT_STATE.GROUP_DIFF) {
-            this.emits(['diff', 'change'], {"previous_state": previous_state});
+            this.emits([HueEvents.diff, HueEvents.state_change], {"previous_state": previous_state});
         } else {
-            this.emits(['off', 'change'], {"previous_state": previous_state});
+            this.emits([HueEvents.off, HueEvents.state_change], {"previous_state": previous_state});
         }
         state_changed = true;
     }

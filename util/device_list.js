@@ -1,16 +1,14 @@
 // External Modules
-var eventEmitter = require('events').EventEmitter;
 var util         = require('util');
 
 // App Modules
-var config       = require("./config.js");
+var config       = require("./config");
 
 var DeviceList = function DeviceList(data) {
     this.devices = {};
     this.device_events = {};
+    this.device_event_objects = {};
 };
-
-util.inherits(DeviceList, eventEmitter);
 
 var bindDeviceEvent = function bindDeviceEvent(device_id, event) {
     var self = this;
@@ -20,8 +18,8 @@ var bindDeviceEvent = function bindDeviceEvent(device_id, event) {
 };
 
 var triggerDeviceEvent = function triggerDeviceEvent(event, device, arguments) {
-    for (var i in this.device_events[event]) {
-        var callback = this.device_events[event][i];
+    for (var i in this.device_events[event.key]) {
+        var callback = this.device_events[event.key][i];
         callback(device, arguments);
     }
 };
@@ -30,8 +28,8 @@ DeviceList.prototype = {
     add: function add(device_id, device) {
         this.devices[device_id] = device;
 
-        for (var event in this.device_events) {
-            bindDeviceEvent.call(this, device_id, event);
+        for (var event_key in this.device_events) {
+            bindDeviceEvent.call(this, device_id, this.device_event_objects[event_key]);
         }
     },
 
@@ -56,11 +54,12 @@ DeviceList.prototype = {
     },
 
     onDeviceEvent: function onDeviceEvent(event, callback) {
-        if (!this.device_events[event]) {
-            this.device_events[event] = [];
+        if (!this.device_events[event.key]) {
+            this.device_events[event.key] = [];
+            this.device_event_objects[event.key] = event;
         }
 
-        this.device_events[event].push(callback);
+        this.device_events[event.key].push(callback);
 
         for (var device_id in this.devices) {
             bindDeviceEvent.call(this, device_id, event);

@@ -1,10 +1,13 @@
 // External Modules
 var util         = require('util');
-var eventEmitter = require('events').EventEmitter;
 
 // App Modules
-var config       = require("../../../util/config.js");
+var config       = require("../../../util/config");
 var request      = require('../../../util/request');
+var eventEmitter = require("../../../util/event_emitter");
+
+// Local Modules
+var SteamEvents  = require("./events");
 
 // Private vars
 var api;
@@ -60,10 +63,10 @@ SteamHost.prototype.getFriendStatus = function getFriendStatus() {
                         //we had player state, see if it changed
                         if (friend_is_online && !friend_was_online[friend.steamid]) {
                             friend_was_online[friend.steamid] = true;
-                            this.emit("friend_signed_on", {friend: friend});
+                            this.emit(SteamEvents.friend_signed_on, {friend: friend});
                         } else if (!friend_is_online && friend_was_online[friend.steamid]) {
                             friend_was_online[friend.steamid] = false;
-                            this.emit("friend_signed_off", {friend: friend});
+                            this.emit(SteamEvents.friend_signed_off, {friend: friend});
                         }
                     }
                 }

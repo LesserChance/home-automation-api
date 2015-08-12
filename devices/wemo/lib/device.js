@@ -1,8 +1,13 @@
 // External Modules
-var eventEmitter = require('events').EventEmitter;
 var wemoNode     = require('wemonode').WemoNode();
 var util         = require('util');
 var Q            = require('q');
+
+// App Modules
+var eventEmitter = require("../../../util/event_emitter");
+
+// Local Modules
+var WemoEvents   = require("./events");
 
 /**
  * Public events are: load, change, on, off
@@ -16,7 +21,7 @@ var WemoDevice = function(data) {
     this.state = {"on":null};
     this.state_deferred = null;
 
-    wemoNode.once("state_changed", init.bind(this));
+    wemoNode.once(WemoEvents.state_changed, init.bind(this));
 };
 
 util.inherits(WemoDevice, eventEmitter);
@@ -29,12 +34,12 @@ WemoDevice.prototype.handleStateChange = function handleStateChange(data) {
         this.state.on = data.binarystate;
 
         // Emit a change event
-        this.emit('change');
+        this.emit(WemoEvents.change);
 
         if (data.binarystate) {
-            this.emit('on');
+            this.emit(WemoEvents.on);
         } else {
-            this.emit('off');
+            this.emit(WemoEvents.off);
         }
     }
 
@@ -111,9 +116,9 @@ var init = function init(data) {
     this.state.on = data.binarystate;
     this.loaded = true;
 
-    this.emit("load");
+    this.emit(WemoEvents.load);
 
-    wemoNode.on("state_changed", function (data) {
+    wemoNode.on(WemoEvents.state_changed, function (data) {
         this.handleStateChange(data);
     }.bind(this));
 };

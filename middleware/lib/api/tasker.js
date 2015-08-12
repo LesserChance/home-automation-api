@@ -1,6 +1,6 @@
 // App Modules
 var user         = require("../../../devices/user");
-var config       = require("../../../util/config.js");
+var config       = require("../../../util/config");
 
 // constants
 var LOCATION     = require("../../../constants/location");
@@ -50,18 +50,14 @@ module.exports = {
 };
 
 var emitUserEvent = function emitUserEvent(req, res, next) {
-    console.debug("emitUserEvent");
-    console.debug(req.data.event);
-    console.debug(req.data.state);
-
     switch (req.data.event) {
         case "screen":
             switch (req.data.state) {
                 case "off":
-                    req.user.emitPhoneEvent("screen_off", req.data);
+                    req.user.emitPhoneEvent(user.events.phone.screen_off, req.data);
                     break;
                 case "on":
-                    req.user.emitPhoneEvent("screen_on", req.data);
+                    req.user.emitPhoneEvent(user.events.phone.screen_on, req.data);
                     break;
             }
             break;
@@ -71,10 +67,6 @@ var emitUserEvent = function emitUserEvent(req, res, next) {
 };
 
 var handleUserLocation = function handleUserLocation(req, res, next) {
-    console.debug("handleUserLocation");
-    console.debug(req.data.action);
-    console.debug(req.data.location);
-
     switch (req.data.action) {
         case LOCATION.EVENT.ENTERED:
             req.user.setLocation(req.data.location);
@@ -88,16 +80,9 @@ var handleUserLocation = function handleUserLocation(req, res, next) {
 };
 
 var handleUserGesture = function handleUserGesture(req, res, next) {
-    console.debug("handleUserGesture");
-    console.debug(req.data.gesture);
-    console.debug(req.data.duration);
-
     api.success(res, {});
 };
 
 var handleUserBattery = function handleUserBattery(req, res, next) {
-    console.debug("handleUserBattery");
-    console.debug(req.data.level); //(split at 20)
-
     api.success(res, {});
 };

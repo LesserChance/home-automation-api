@@ -1,8 +1,13 @@
 // External Modules
 var twilio       = require('twilio');
 var util         = require('util');
-var eventEmitter = require('events').EventEmitter;
 var Q            = require('q');
+
+// App Modules
+var eventEmitter = require("../../../util/event_emitter");
+
+// Local Modules
+var TwilioEvents = require("./events");
 
 var TwilioPhone = function (data) {
     this.id = data.id;
@@ -22,7 +27,7 @@ TwilioPhone.prototype.sendSMS = function sendSMS(number, message) {
         to: number,
         from: this.id
     }, function(err, message) {
-        this.emit("sms_sent", message);
+        this.emit(TwilioEvents.sms_sent, message);
         deferred.resolve();
     }.bind(this));
 

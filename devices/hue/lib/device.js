@@ -1,11 +1,13 @@
 // External Modules
-var eventEmitter = require('events').EventEmitter;
 var util         = require('util');
 var Q            = require('q');
 var rgb          = require('node-hue-api/hue-api/rgb');
 
 // App Modules
-var MultiEmit     = require("../../../util/multi_emitter");
+var eventEmitter = require("../../../util/event_emitter");
+
+// Local Modules
+var HueEvents    = require("./events");
 
 /**
  * Interface
@@ -18,15 +20,6 @@ function HueDevice() {
 }
 
 util.inherits(HueDevice, eventEmitter);
-
-/**
- * Emit multiple events
- * @param events
- * @param args
- */
-HueDevice.prototype.emits = function emits(events, args) {
-    MultiEmit.call(this, events, args);
-};
 
 /**
  * return the url used to retrieve this devices state
@@ -66,8 +59,8 @@ HueDevice.prototype.setOn = function setOn() {
     if (this.state.on) {
         deferred.resolve();
     } else {
-        this.emit('turning_on');
-        this.once("on", function() {
+        this.emit(HueEvents.turning_on);
+        this.once(HueEvents.on, function() {
             deferred.resolve();
         });
         require("./host").performRequest(
@@ -89,8 +82,8 @@ HueDevice.prototype.setOff = function setOff() {
     if (!this.state.on) {
         deferred.resolve();
     } else {
-        this.emit('turning_off');
-        this.once("off", function() {
+        this.emit(HueEvents.turning_off);
+        this.once(HueEvents.off, function() {
             deferred.resolve();
         });
         require("./host").performRequest(
@@ -133,7 +126,7 @@ HueDevice.prototype.dim = function dim(brightness, duration) {
         {
             "bri": parseInt(brightness, 10)
         },
-        'dimming',
+        HueEvents.dimming,
         duration
     );
 };
@@ -159,7 +152,7 @@ HueDevice.prototype.color = function color(hex, duration) {
         {
             "xy": rgb.convertRGBtoXY(hexToRgb(hex), {modelId: this.model_id})
         },
-        'setting_color',
+        HueEvents.setting_color,
         duration
     );
 };
@@ -172,7 +165,7 @@ HueDevice.prototype.color = function color(hex, duration) {
 HueDevice.prototype.effect = function effect(effect) {
     return this.setNewState(
         {"effect": effect},
-        'starting_effect'
+        HueEvents.starting_effect
     );
 };
 
@@ -183,7 +176,7 @@ HueDevice.prototype.effect = function effect(effect) {
 HueDevice.prototype.alert = function alert() {
     return this.setNewState(
         {"alert": "lselect"},
-        'alerting'
+        HueEvents.alerting
     );
 };
 
@@ -199,7 +192,7 @@ HueDevice.prototype.setNewState = function setNewState(new_state, emit_event) {
 
     if (!this.state.on) {
         new_state.on = true;
-        emit_events.push('turning_on');
+        emit_events.push(HueEvents.turning_on);
         callback = handleFinishedStateFromOff.bind(this);
     }
 
@@ -249,20 +242,20 @@ HueDevice.prototype.setPermanentOrTempState = function setPermanentOrTempState(n
  */
 var handleFinishedState = function handleFinishedState(event, new_state) {
     switch (event) {
-        case "dimming":
-            this.emit("dimmed", {state: new_state});
+        case HueEvents.dimming:
+            this.emit(HueEvents.dimmed, {state: new_state});
             break;
 
-        case "setting_color":
-            this.emit("set_color", {state: new_state});
+        case HueEvents.setting_color:
+            this.emit(HueEvents.set_color, {state: new_state});
             break;
 
-        case "starting_effect":
-            this.emit(new_state.effect !== "none" ? 'effect_start' : 'effect_end', {state: new_state});
+        case HueEvents.starting_effect:
+            this.emit(new_state.effect !== "none" ? HueEvents.effect_start : HueEvents.effect_end, {state: new_state});
             break;
 
-        case "loading_scene":
-            this.emit("loaded_scene", {state: new_state});
+        case HueEvents.loading_scene:
+            this.emit(HueEvents.loaded_scene, {state: new_state});
             break;
     }
 
@@ -278,7 +271,7 @@ var handleFinishedState = function handleFinishedState(event, new_state) {
 var handleFinishedStateFromOff = function handleFinishedStateFromOff(event, new_state) {
     var previous_state = this.state.on;
     this.state.on = this.constants.STATE_ON;
-    this.emits(['on','changed'], {"previous_state": previous_state});
+    this.emits([HueEvents.on, HueEvents.state_change], {"previous_state": previous_state});
 
     handleFinishedState.call(this, event, new_state);
 };

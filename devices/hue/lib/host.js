@@ -1,17 +1,18 @@
 // External Modules
 var util          = require('util');
-var eventEmitter  = require('events').EventEmitter;
 var hue           = require('node-hue-api');
 var Q             = require('q');
 
 // App Modules
 var DeviceList    = require("../../../util/device_list");
-var config        = require("../../../util/config.js");
+var config        = require("../../../util/config");
 var request       = require('../../../util/request');
+var eventEmitter  = require("../../../util/event_emitter");
 
 // Local Modules
-var HueLight      = require("./light.js");
-var HueLightGroup = require("./light_group.js");
+var HueLight      = require("./light");
+var HueLightGroup = require("./light_group");
+var HueEvents     = require("./events");
 
 // Private vars
 var api;
@@ -29,11 +30,11 @@ var HueHost = function () {
     this.light_group_list = new DeviceList();
 
     // when an method is triggered causing a light change, poll more frequently
-    this.light_list.onDeviceEvent("turning_on", this.increasePollRate.bind(this));
-    this.light_list.onDeviceEvent("turning_off", this.increasePollRate.bind(this));
+    this.light_list.onDeviceEvent(HueEvents.turning_on, this.increasePollRate.bind(this));
+    this.light_list.onDeviceEvent(HueEvents.turning_off, this.increasePollRate.bind(this));
 
-    this.light_group_list.onDeviceEvent("turning_on", this.increasePollRate.bind(this));
-    this.light_group_list.onDeviceEvent("turning_off", this.increasePollRate.bind(this));
+    this.light_group_list.onDeviceEvent(HueEvents.turning_on, this.increasePollRate.bind(this));
+    this.light_group_list.onDeviceEvent(HueEvents.turning_off, this.increasePollRate.bind(this));
 
     hue.nupnpSearch()
         .then(function(results) {
@@ -166,7 +167,7 @@ var getLightGroups = function getLightGroups() {
 
 var ready = function ready() {
     poll.call(this);
-    this.emit("ready");
+    this.emit(HueEvents.load);
 };
 
 var poll = function poll() {

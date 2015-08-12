@@ -1,15 +1,16 @@
 // External Modules
 var util         = require('util');
-var eventEmitter = require('events').EventEmitter;
 var twilio       = require('twilio');
 var http         = require('http');
 
 // App Modules
 var DeviceList   = require("../../../util/device_list");
-var config       = require("../../../util/config.js");
+var config       = require("../../../util/config");
+var eventEmitter = require("../../../util/event_emitter");
 
 // Local Modules
 var TwilioPhone  = require('./phone');
+var TwilioEvents = require("./events");
 
 // Private vars
 var api;

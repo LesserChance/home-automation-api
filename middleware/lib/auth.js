@@ -4,7 +4,7 @@ var cookieParser = require('cookie-parser');
 
 // App Modules
 var user         = require("../../devices/user");
-var config       = require("../../util/config.js");
+var config       = require("../../util/config");
 
 module.exports = function (req, res, next) {
     // Special Auth
@@ -43,7 +43,9 @@ module.exports = function (req, res, next) {
                     realm: "Bateman House"
                 }, function (username, password, callback) {
                     // Store the login cookie
-                    res.cookie(config.cookie_name, config.cookie_secret, {});
+                    res.cookie(config.cookie_name, config.cookie_secret, {
+                        maxAge: 365 * 24 * 60 * 1000  // days, hours, minutes, seconds
+                    });
 
                     var static_user = (username === config.username && password === config.password);
                     callback(static_user);

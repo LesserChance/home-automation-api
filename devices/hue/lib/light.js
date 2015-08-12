@@ -1,10 +1,10 @@
 // External Modules
-var eventEmitter = require('events').EventEmitter;
 var util         = require('util');
 var Q            = require('q');
 
 // Local Modules
 var HueDevice    = require("./device");
+var HueEvents    = require("./events");
 
 // constants
 var LIGHT_STATE  = require("../../../constants/light_state");
@@ -78,11 +78,11 @@ HueLight.prototype.handleNewState = function handleNewState(new_state) {
     if (new_state.on != this.state.on) {
         this.state.on = new_state.on;
         if (new_state.on) {
-            this.emit('on');
+            this.emit(HueEvents.on);
         } else {
-            this.emit('off');
+            this.emit(HueEvents.off);
         }
-        this.emit('change');
+        this.emit(HueEvents.state_change);
         state_changed = true;
     }
 
@@ -99,7 +99,7 @@ var init = function init(data) {
     this.state = data.state;
     this.model_id = data.modelId;
     this.loaded = true;
-    this.emit("load");
+    this.emit(HueEvents.load);
 };
 
 module.exports = HueLight;

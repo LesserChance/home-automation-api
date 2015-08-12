@@ -1,9 +1,5 @@
-// External Modules
-var eventEmitter = require('events').EventEmitter;
-var util         = require('util');
-
 // App Modules
-var config       = require("./config.js");
+var config       = require("./config");
 
 var Listener = function Listener(device, event, callback) {
     this.enabled = true;
@@ -34,6 +30,9 @@ var logEvent = function logEvent(response) {
         case "SUCCESS":
             log.details = "Event Occurred: " + response.description;
             break;
+
+        case "IGNORED":
+            return;
     }
 
     if (response.data) {
@@ -74,6 +73,11 @@ module.exports = {
             "code": code,
             "description": description,
             "data": data
+        }
+    },
+    "ignored": function () {
+        return {
+            "status": "IGNORED"
         }
     }
 };

@@ -1,16 +1,17 @@
 // External Modules
 var util         = require('util');
-var eventEmitter = require('events').EventEmitter;
 
 // App Modules
 var hue          = require("../../../devices/hue");
 var DeviceList   = require("../../../util/device_list");
-var config       = require("../../../util/config.js");
-var Listener     = require("../../../util/listener.js");
+var config       = require("../../../util/config");
+var Listener     = require("../../../util/listener");
+var eventEmitter = require("../../../util/event_emitter");
 
 // Local Modules
 var User         = require('./user');
 var Model        = require('./model');
+var UserEvents   = require("./events");
 
 // constants
 var LOCATION     = require("../../../constants/location");

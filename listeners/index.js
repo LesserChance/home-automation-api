@@ -4,8 +4,8 @@ var wemo         = require("../devices/wemo");
 var twilio       = require("../devices/twilio-phone");
 var user         = require("../devices/user");
 var steam        = require("../devices/steam");
-var config       = require("../util/config.js");
-var Listener     = require("../util/listener.js");
+var config       = require("../util/config");
+var Listener     = require("../util/listener");
 
 // constants
 var LIGHT_STATE  = require("../constants/light_state");
@@ -33,7 +33,7 @@ var startListeners = function startListeners() {
 
     listeners.wemo.handle_on = new Listener.listener(
         living_room_wemo,
-        "on",
+        wemo.events.on,
         function() {
             // dont trigger the wemo response when we turn it on
             listeners.living_room_lights.handle_change.disableFor(5000);
@@ -45,7 +45,7 @@ var startListeners = function startListeners() {
 
     listeners.wemo.handle_off = new Listener.listener(
         living_room_wemo,
-        "off",
+        wemo.events.off,
         function() {
             if (living_room_lights.state.on !== 0) {
                 // dont trigger the wemo response when we turn it off
@@ -59,7 +59,7 @@ var startListeners = function startListeners() {
 
     listeners.living_room_lights.handle_change = new Listener.listener(
         living_room_lights,
-        "change",
+        hue.events.state_change,
         function(data) {
             if (!data) {
                 return Listener.error("invalid data", data);
@@ -77,7 +77,7 @@ var startListeners = function startListeners() {
 
     listeners.users.ryan_arrived_home = new Listener.listener(
         ryan,
-        "arrived",
+        user.events.arrived,
         function(data) {
             return user.host.handleLocationChange(ryan, data);
         }
@@ -85,7 +85,7 @@ var startListeners = function startListeners() {
 
     listeners.users.ryan_left_home = new Listener.listener(
         ryan,
-        "leaving",
+        user.events.leaving,
         function(data) {
             return user.host.handleLocationChange(ryan, data);
         }
@@ -93,7 +93,7 @@ var startListeners = function startListeners() {
 
     listeners.users.meredith_arrived_home = new Listener.listener(
         meredith,
-        "arrived",
+        user.events.arrived,
         function(data) {
             return user.host.handleLocationChange(meredith, data);
         }
@@ -101,7 +101,7 @@ var startListeners = function startListeners() {
 
     listeners.users.meredith_left_home = new Listener.listener(
         meredith,
-        "leaving",
+        user.events.leaving,
         function(data) {
             return user.host.handleLocationChange(meredith, data);
         }
@@ -109,29 +109,31 @@ var startListeners = function startListeners() {
 
     listeners.steam.friend_signed_on = new Listener.listener(
         steam_listener,
-        "friend_signed_on",
+        steam.events.friend_signed_on,
         function(data) {
-            if (config.steam_users_to_notify.indexOf(data.friend.personaname) > -1) {
-                if (ryan.get("location") === LOCATION.HOME && living_room_wemo.state.on) {
-                    //flash the lights blue
-                    living_room_lights.color("#0000FF", 5000);
-
-                    //text ryan
-                    phone.sendSMS(ryan.get("phone_number"), data.friend.personaname + " signed on");
-                }
-
-                return Listener.success("Friend signed onto steam, signaled lights and text", {"friend":data.friend.personaname});
+            if (config.steam_users_to_notify.indexOf(data.friend.personaname) === -1) {
+                return Listener.ignored();
             }
+
+            if (ryan.get("location") === LOCATION.HOME && living_room_wemo.state.on) {
+                //flash the lights blue
+                living_room_lights.color("#0000FF", 5000);
+
+                //text ryan
+                phone.sendSMS(ryan.get("phone_number"), data.friend.personaname + " signed on");
+            }
+
+            return Listener.success("Friend signed onto steam, signaled lights and text", {"friend":data.friend.personaname});
         }
     );
 };
 
 module.exports =  {
     initialize: function initialize(app) {
-        hue.host.on("ready", function() {
+        hue.host.on(hue.events.load, function() {
             startListeners();
             console.debug("Listeners Ready");
-            console.log("---------------------------------------");
+            console.debug("---------------------------------------");
         });
     }
 };

@@ -4,7 +4,7 @@ var auth         = require('http-auth');
 var cookieParser = require('cookie-parser');
 
 // App Modules
-var config  = require("../util/config.js");
+var config  = require("../util/config");
 
 module.exports = {
     initialize: function initialize(app) {
@@ -12,7 +12,7 @@ module.exports = {
         app.use(cookieParser());
 
         // Authenticate all requests
-        app.use("/", require("./lib/auth.js"));
+        app.use("/", require("./lib/auth"));
 
         // Serve Static Assets
         require("./lib/static").init(app);
