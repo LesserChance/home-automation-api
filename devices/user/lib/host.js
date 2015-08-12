@@ -5,13 +5,11 @@ var util         = require('util');
 var hue          = require("../../../devices/hue");
 var DeviceList   = require("../../../util/device_list");
 var config       = require("../../../util/config");
-var Listener     = require("../../../util/listener");
 var eventEmitter = require("../../../util/event_emitter");
 
 // Local Modules
 var User         = require('./user');
 var Model        = require('./model');
-var UserEvents   = require("./events");
 
 // constants
 var LOCATION     = require("../../../constants/location");
@@ -39,31 +37,6 @@ UserHost.prototype.init = function init() {
 
 UserHost.prototype.getUser = function getUser(user_name) {
     return this.user_list.getNamedDevice(user_name);
-};
-
-UserHost.prototype.handleLocationChange = function handleLocationChange(user, event_data) {
-    var other_user = this.getUser("ryan");
-
-    if (user == other_user) {
-        other_user = this.getUser("meredith");
-    }
-
-    if (user.get("location") == LOCATION.HOME) {
-        var living_room_lights = hue.host.getLightGroup(0);
-        var user_scene = user.get("home_light_preference");
-
-        if (other_user.get("location") != LOCATION.HOME || user == this.getUser("ryan")) {
-            // The other user is not home, set the lights up
-            living_room_lights.setScene(user_scene);
-            return Listener.success("User arrived home, set permanent scene", {"scene":user_scene});
-        } else {
-            // The other user is home, blink the lights to notify that user is close
-            living_room_lights.setScene(user_scene, 3000);
-            return Listener.success("User arrived home, set temporary scene", {"scene":user_scene});
-        }
-    }
-
-    return null;
 };
 
 module.exports = new UserHost();

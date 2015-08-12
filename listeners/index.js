@@ -79,15 +79,9 @@ var startListeners = function startListeners() {
         ryan,
         user.events.arrived,
         function(data) {
-            return user.host.handleLocationChange(ryan, data);
-        }
-    );
-
-    listeners.users.ryan_left_home = new Listener.listener(
-        ryan,
-        user.events.leaving,
-        function(data) {
-            return user.host.handleLocationChange(ryan, data);
+            var user_scene = ryan.get("home_light_preference");
+            living_room_lights.setScene(user_scene);
+            return Listener.success("Ryan arrived home, set permanent scene", {"scene":user_scene});
         }
     );
 
@@ -95,15 +89,13 @@ var startListeners = function startListeners() {
         meredith,
         user.events.arrived,
         function(data) {
-            return user.host.handleLocationChange(meredith, data);
-        }
-    );
+            if (ryan.get("location") === LOCATION.HOME) {
+                return Listener.ignored();
+            }
 
-    listeners.users.meredith_left_home = new Listener.listener(
-        meredith,
-        user.events.leaving,
-        function(data) {
-            return user.host.handleLocationChange(meredith, data);
+            var user_scene = meredith.get("home_light_preference");
+            living_room_lights.setScene(user_scene);
+            return Listener.success("Meredith arrived home, set permanent scene", {"scene":user_scene});
         }
     );
 
@@ -126,14 +118,15 @@ var startListeners = function startListeners() {
             return Listener.success("Friend signed onto steam, signaled lights and text", {"friend":data.friend.personaname});
         }
     );
+
+    console.debug("Listeners Ready");
+    console.debug("---------------------------------------");
 };
 
 module.exports =  {
     initialize: function initialize(app) {
         hue.host.on(hue.events.load, function() {
             startListeners();
-            console.debug("Listeners Ready");
-            console.debug("---------------------------------------");
         });
     }
 };

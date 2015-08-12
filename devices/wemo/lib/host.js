@@ -20,13 +20,13 @@ var WemoHost = function () {
 
     wemoNode.setBindAddress(config.ipaddress);
 
-    wemoNode.on(WemoEvents.device_found, function (device) {
+    wemoNode.on("device_found", function (device) {
         this.device_list.add(device.id, new WemoDevice(device));
         this.device_data[device.id] = device;
         wemoNode._updateBinaryStates();
     }.bind(this));
 
-    wemoNode.on(WemoEvents.device_lost, function (device) {
+    wemoNode.on("device_lost", function (device) {
         this.device_list.remove(device.id);
         delete this.device_data[device.id];
 

@@ -17,13 +17,5 @@ module.exports = {
     "load" : new Event({
         "key": "load",
         "description": "When the device is ready to handle events"
-    }),
-    "device_found" : new Event({
-        "key": "device_found",
-        "description": "A Wemo device has been found"
-    }),
-    "device_lost" : new Event({
-        "key": "device_lost",
-        "description": "A Wemo device has been lost"
     })
 };
