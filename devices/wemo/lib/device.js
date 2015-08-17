@@ -21,7 +21,7 @@ var WemoDevice = function(data) {
     this.state = {"on":null};
     this.state_deferred = null;
 
-    wemoNode.once(WemoEvents.state_changed, init.bind(this));
+    wemoNode.once("state_changed", init.bind(this));
 };
 
 util.inherits(WemoDevice, eventEmitter);
@@ -34,7 +34,7 @@ WemoDevice.prototype.handleStateChange = function handleStateChange(data) {
         this.state.on = data.binarystate;
 
         // Emit a change event
-        this.emit(WemoEvents.change);
+        this.emit(WemoEvents.state_change);
 
         if (data.binarystate) {
             this.emit(WemoEvents.on);
@@ -118,7 +118,7 @@ var init = function init(data) {
 
     this.emit(WemoEvents.load);
 
-    wemoNode.on(WemoEvents.state_changed, function (data) {
+    wemoNode.on("state_changed", function (data) {
         this.handleStateChange(data);
     }.bind(this));
 };
