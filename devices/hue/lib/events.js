@@ -11,11 +11,11 @@ module.exports = {
         "description": "When the device is about to turn off"
     }),
     "on" : new Event({
-        "key": "on",
+        "key": "turned_on",
         "description": "When the device has been turned on"
     }),
     "off" : new Event({
-        "key": "off",
+        "key": "turned_off",
         "description": "When the device has been turned off"
     }),
     "state_change" : new Event({

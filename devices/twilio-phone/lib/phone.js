@@ -27,7 +27,7 @@ TwilioPhone.prototype.sendSMS = function sendSMS(number, message) {
         to: number,
         from: this.id
     }, function(err, message) {
-        this.emit(TwilioEvents.sms_sent, message);
+        this.emit(TwilioEvents.sms_sent.key, message);
         deferred.resolve();
     }.bind(this));
 

@@ -28,7 +28,7 @@ function HueLightGroup(data) {
     this.loaded = false;
     this.state = {"on":null};
 
-    this.light_devices.onDeviceEvent(HueEvents.state_change, handleNewLightState.bind(this));
+    this.light_devices.onDeviceEvent(HueEvents.state_change.key, handleNewLightState.bind(this));
 
     // Retrieve the current light status
     init.call(this, data);
@@ -73,7 +73,7 @@ HueLightGroup.prototype.setScene = function setScene(scene_id, duration) {
     } else {
         return this.setNewState(
             {scene: scene_id},
-            HueEvents.loading_scene
+            HueEvents.loading_scene.key
         );
     }
 };
@@ -124,7 +124,7 @@ var init = function init(data) {
     this.model_id = light.modelId;
 
     this.loaded = true;
-    this.emit(HueEvents.load);
+    this.emit(HueEvents.load.key);
 };
 
 /**
@@ -184,11 +184,11 @@ var handleNewLightState = function handleNewLightState() {
         var previous_state = this.state.on;
         this.state.on = new_state;
         if (new_state === LIGHT_STATE.GROUP_ON) {
-            this.emits([HueEvents.on, HueEvents.state_change], {"previous_state": previous_state});
+            this.emits([HueEvents.on.key, HueEvents.state_change.key], {"previous_state": previous_state});
         } else if (new_state === LIGHT_STATE.GROUP_DIFF) {
-            this.emits([HueEvents.diff, HueEvents.state_change], {"previous_state": previous_state});
+            this.emits([HueEvents.diff.key, HueEvents.state_change.key], {"previous_state": previous_state});
         } else {
-            this.emits([HueEvents.off, HueEvents.state_change], {"previous_state": previous_state});
+            this.emits([HueEvents.off.key, HueEvents.state_change.key], {"previous_state": previous_state});
         }
         state_changed = true;
     }

@@ -30,11 +30,11 @@ var HueHost = function () {
     this.light_group_list = new DeviceList();
 
     // when an method is triggered causing a light change, poll more frequently
-    this.light_list.onDeviceEvent(HueEvents.turning_on, this.increasePollRate.bind(this));
-    this.light_list.onDeviceEvent(HueEvents.turning_off, this.increasePollRate.bind(this));
+    this.light_list.onDeviceEvent(HueEvents.turning_on.key, this.increasePollRate.bind(this));
+    this.light_list.onDeviceEvent(HueEvents.turning_off.key, this.increasePollRate.bind(this));
 
-    this.light_group_list.onDeviceEvent(HueEvents.turning_on, this.increasePollRate.bind(this));
-    this.light_group_list.onDeviceEvent(HueEvents.turning_off, this.increasePollRate.bind(this));
+    this.light_group_list.onDeviceEvent(HueEvents.turning_on.key, this.increasePollRate.bind(this));
+    this.light_group_list.onDeviceEvent(HueEvents.turning_off.key, this.increasePollRate.bind(this));
 
     hue.nupnpSearch()
         .then(function(results) {
@@ -167,7 +167,7 @@ var getLightGroups = function getLightGroups() {
 
 var ready = function ready() {
     poll.call(this);
-    this.emit(HueEvents.load);
+    this.emit(HueEvents.load.key);
 };
 
 var poll = function poll() {

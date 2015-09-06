@@ -4,14 +4,21 @@ var config       = require("./config");
 var Listener = function Listener(device, event, callback) {
     this.enabled = true;
 
-    device.on(event, function() {
-        if (this.enabled) {
-            var response = callback.apply(null, arguments);
-            if (response) {
-                logEvent(response);
+    try {
+        device.on(event, function() {
+            if (this.enabled) {
+                var response = callback.apply(null, arguments);
+                if (response) {
+                    logEvent(response);
+                }
             }
-        }
-    }.bind(this));
+        }.bind(this));
+    } catch (e) {
+        console.debug("Error on event binding");
+        console.debug("event:" + event);
+        console.debug(e);
+        console.trace();
+    }
 };
 
 var logEvent = function logEvent(response) {

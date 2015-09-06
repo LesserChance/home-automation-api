@@ -63,10 +63,10 @@ SteamHost.prototype.getFriendStatus = function getFriendStatus() {
                         //we had player state, see if it changed
                         if (friend_is_online && !friend_was_online[friend.steamid]) {
                             friend_was_online[friend.steamid] = true;
-                            this.emit(SteamEvents.friend_signed_on, {friend: friend});
+                            this.emit(SteamEvents.friend_signed_on.key, {friend: friend});
                         } else if (!friend_is_online && friend_was_online[friend.steamid]) {
                             friend_was_online[friend.steamid] = false;
-                            this.emit(SteamEvents.friend_signed_off, {friend: friend});
+                            this.emit(SteamEvents.friend_signed_off.key, {friend: friend});
                         }
                     }
                 }

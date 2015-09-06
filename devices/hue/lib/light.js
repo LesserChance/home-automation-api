@@ -78,11 +78,11 @@ HueLight.prototype.handleNewState = function handleNewState(new_state) {
     if (new_state.on != this.state.on) {
         this.state.on = new_state.on;
         if (new_state.on) {
-            this.emit(HueEvents.on);
+            this.emit(HueEvents.on.key);
         } else {
-            this.emit(HueEvents.off);
+            this.emit(HueEvents.off.key);
         }
-        this.emit(HueEvents.state_change);
+        this.emit(HueEvents.state_change.key);
         state_changed = true;
     }
 
@@ -99,7 +99,7 @@ var init = function init(data) {
     this.state = data.state;
     this.model_id = data.modelId;
     this.loaded = true;
-    this.emit(HueEvents.load);
+    this.emit(HueEvents.load.key);
 };
 
 module.exports = HueLight;

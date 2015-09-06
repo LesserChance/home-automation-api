@@ -54,10 +54,10 @@ var emitUserEvent = function emitUserEvent(req, res, next) {
         case "screen":
             switch (req.data.state) {
                 case "off":
-                    req.user.emitPhoneEvent(user.events.phone.screen_off, req.data);
+                    req.user.emitPhoneEvent(user.events.phone.screen_off.key, req.data);
                     break;
                 case "on":
-                    req.user.emitPhoneEvent(user.events.phone.screen_on, req.data);
+                    req.user.emitPhoneEvent(user.events.phone.screen_on.key, req.data);
                     break;
             }
             break;

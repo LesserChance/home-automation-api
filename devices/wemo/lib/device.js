@@ -34,12 +34,12 @@ WemoDevice.prototype.handleStateChange = function handleStateChange(data) {
         this.state.on = data.binarystate;
 
         // Emit a change event
-        this.emit(WemoEvents.state_change);
+        this.emit(WemoEvents.state_change.key);
 
         if (data.binarystate) {
-            this.emit(WemoEvents.on);
+            this.emit(WemoEvents.on.key);
         } else {
-            this.emit(WemoEvents.off);
+            this.emit(WemoEvents.off.key);
         }
     }
 
@@ -116,7 +116,7 @@ var init = function init(data) {
     this.state.on = data.binarystate;
     this.loaded = true;
 
-    this.emit(WemoEvents.load);
+    this.emit(WemoEvents.load.key);
 
     wemoNode.on("state_changed", function (data) {
         this.handleStateChange(data);

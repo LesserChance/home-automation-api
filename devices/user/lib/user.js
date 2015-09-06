@@ -32,11 +32,11 @@ User.prototype.setLocation = function setLocation(new_location) {
 
         // Trigger events
         if (new_location === LOCATION.TRANSIT) {
-            this.emit(UserEvents.leaving, {
+            this.emit(UserEvents.leaving.key, {
                 "previous_location": previous_location
             });
         } else {
-            this.emit(UserEvents.arrived, {
+            this.emit(UserEvents.arrived.key, {
                 "previous_location": previous_location
             });
         }

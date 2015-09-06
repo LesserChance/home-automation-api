@@ -33,7 +33,7 @@ var startListeners = function startListeners() {
 
     listeners.wemo.handle_on = new Listener.listener(
         living_room_wemo,
-        wemo.events.on,
+        wemo.events.on.key,
         function() {
             // dont trigger the wemo response when we turn it on
             listeners.living_room_lights.handle_change.disableFor(5000);
@@ -45,7 +45,7 @@ var startListeners = function startListeners() {
 
     listeners.wemo.handle_off = new Listener.listener(
         living_room_wemo,
-        wemo.events.off,
+        wemo.events.off.key,
         function() {
             if (living_room_lights.state.on !== 0) {
                 // dont trigger the wemo response when we turn it off
@@ -59,7 +59,7 @@ var startListeners = function startListeners() {
 
     listeners.living_room_lights.handle_change = new Listener.listener(
         living_room_lights,
-        hue.events.state_change,
+        hue.events.state_change.key,
         function(data) {
             if (!data) {
                 return Listener.error("invalid data", data);
@@ -77,7 +77,7 @@ var startListeners = function startListeners() {
 
     listeners.users.ryan_arrived_home = new Listener.listener(
         ryan,
-        user.events.arrived,
+        user.events.arrived.key,
         function(data) {
             var user_scene = ryan.get("home_light_preference");
             living_room_lights.setScene(user_scene);
@@ -87,7 +87,7 @@ var startListeners = function startListeners() {
 
     listeners.users.meredith_arrived_home = new Listener.listener(
         meredith,
-        user.events.arrived,
+        user.events.arrived.key,
         function(data) {
             if (ryan.get("location") === LOCATION.HOME) {
                 return Listener.ignored();
@@ -101,7 +101,7 @@ var startListeners = function startListeners() {
 
     listeners.steam.friend_signed_on = new Listener.listener(
         steam_listener,
-        steam.events.friend_signed_on,
+        steam.events.friend_signed_on.key,
         function(data) {
             if (config.steam_users_to_notify.indexOf(data.friend.personaname) === -1) {
                 return Listener.ignored();
@@ -125,7 +125,7 @@ var startListeners = function startListeners() {
 
 module.exports =  {
     initialize: function initialize(app) {
-        hue.host.on(hue.events.load, function() {
+        hue.host.on(hue.events.load.key, function() {
             startListeners();
         });
     }
