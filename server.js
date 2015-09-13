@@ -25,4 +25,4 @@ console.log((new Date()).toString());
 console.log('Server Initialized, port ' + config.port);
 
 // Init Listeners
-require('./listeners').initialize(app);
+require('./startup').initialize(app);

@@ -16,8 +16,9 @@
         "express": "4.10.6",
         "express-ifttt-webhook": "0.2.2",
         "mongoose": "3.8.2",
+        "mongoose-function": "0.1.0",
         "http-auth": "2.2.5",
-        "node-hue-api": "0.2.7",
+        "node-hue-api": "1.0.5",
         "q": "1.1.2",
         "twilio": "1.8.0",
         "wemonode": "1.0.11"

@@ -39,6 +39,7 @@ var logEvent = function logEvent(response) {
             break;
 
         case "IGNORED":
+        case "START":
             return;
     }
 
@@ -85,6 +86,11 @@ module.exports = {
     "ignored": function () {
         return {
             "status": "IGNORED"
+        }
+    },
+    "start": function () {
+        return {
+            "status": "START"
         }
     }
 };
