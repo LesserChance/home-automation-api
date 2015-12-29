@@ -150,7 +150,7 @@ HueDevice.prototype.colorLoop = function colorLoop(length) {
 HueDevice.prototype.color = function color(hex, duration) {
     return this.setPermanentOrTempState(
         {
-            "xy": rgb.convertRGBtoXY(hexToRgb(hex), {modelId: this.model_id})
+            "xy": rgb.convertRGBtoXY(hexToRgb(hex), this.model_id)
         },
         HueEvents.setting_color.key,
         duration

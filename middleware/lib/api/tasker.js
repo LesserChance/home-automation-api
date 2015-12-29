@@ -16,6 +16,8 @@ module.exports = {
             // Assert a user
             if (req.get('user-agent') === config.ryan_tasker_key) {
                 req.user = user.host.getUser("ryan");
+            } else if (req.get('user-agent') === config.meredith_tasker_key) {
+                req.user = user.host.getUser("meredith");
             } else {
                 return api.error(res, {}, 404, 'Invalid User Key', 'INVALIDUSERKEY');
             }

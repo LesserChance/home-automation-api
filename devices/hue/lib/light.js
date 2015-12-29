@@ -19,7 +19,7 @@ function HueLight(data) {
 
     this.id = data.id;
     this.name = data.name;
-    this.model_id = data.modelId;
+    this.model_id = data.modelid;
 
     this.loaded = false;
     this.state = null;
@@ -97,7 +97,7 @@ HueLight.prototype.handleNewState = function handleNewState(new_state) {
  */
 var init = function init(data) {
     this.state = data.state;
-    this.model_id = data.modelId;
+    this.model_id = data.modelid;
     this.loaded = true;
     this.emit(HueEvents.load.key);
 };
