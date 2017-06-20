@@ -41,6 +41,60 @@ var routeCinemaExperienceRequest = function routeCinemaExperienceRequest(req, re
             living_room_lights.setScene("hamovie");
             handled = true;
             break;
+        case "ha_paused":
+            // Paused
+            living_room_lights.setScene("hapaused");
+            handled = true;
+            break;
+        case "ha_trivia_intro":
+            handled = true;
+            break;
+        case "ha_trivia_start":
+            handled = true;
+            break;
+        case "ha_trivia_outro":
+            handled = true;
+            break;
+        case "ha_cav_intro":
+            handled = true;
+            break;
+        case "ha_cav_outro":
+            handled = true;
+            break;
+        case "ha_fpv_intro":
+            handled = true;
+            break;
+        case "ha_3d_intro":
+            handled = true;
+            break;
+        case "ha_3d_trailer":
+            handled = true;
+            break;
+        case "ha_3d_outro":
+            handled = true;
+            break;
+        case "ha_mpaa_rating":
+            handled = true;
+            break;
+        case "ha_countdown_video":
+            handled = true;
+            break;
+        case "ha_audio_format":
+            handled = true;
+            break;
+        case "ha_fpv_outro":
+            handled = true;
+            break;
+        case "ha_mte_outro":
+            handled = true;
+            break;
+        case "ha_intermission":
+            handled = true;
+            break;
+        case "ha_script_end":
+            living_room_lights.setScene("ha_script_end");
+            handled = true;
+            break;
     }
 
     listener.log(

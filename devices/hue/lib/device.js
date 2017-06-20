@@ -150,11 +150,18 @@ HueDevice.prototype.colorLoop = function colorLoop(length) {
 HueDevice.prototype.color = function color(hex, duration) {
     return this.setPermanentOrTempState(
         {
-            "xy": rgb.convertRGBtoXY(hexToRgb(hex), this.model_id)
+            "xy": this.getXyFromHex(hex)
         },
         HueEvents.setting_color.key,
         duration
     );
+};
+
+/**
+ * Set the device color
+ */
+HueDevice.prototype.getXyFromHex = function color(hex) {
+    return rgb.convertRGBtoXY(hexToRgb(hex), this.model_id || "");
 };
 
 /**

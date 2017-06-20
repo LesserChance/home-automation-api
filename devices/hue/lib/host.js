@@ -96,6 +96,32 @@ HueHost.prototype.loadScene = function loadScene(req) {
     return this.getLightGroup(0).setScene(req.light_scene_id);
 };
 
+/**
+ * This lets you just set all the lights at once
+ * @param req
+ */
+HueHost.prototype.createScene = function loadScene(req) {
+    var ids = this.light_list.getAllIds();
+
+    for (var i = 0, iEnd = ids.length; i < iEnd; i++) {
+        var light = this.light_list.get(ids[i]);
+        if (req.body[ids[i]]) {
+            var on = !!req.body[ids[i]]["on"];
+
+            var state = {on: on};
+
+            if (on) {
+                state["bri"] = req.body[ids[i]]["bri"];
+                state["xy"] = light.getXyFromHex(req.body[ids[i]]["color"]);
+            }
+
+            light.setState(state);
+        }
+    }
+
+    return this.performRequest("/scenes", "GET");
+};
+
 HueHost.prototype.increasePollRate = function increasePollRate() {
     if (this.poll_timeout != fast_poll) {
         this.poll_timeout = fast_poll;
@@ -180,6 +206,10 @@ var poll = function poll() {
 };
 
 var updateLightState = function updateLightState(data) {
+    if (!data) {
+        return;
+    }
+
     var state_changed = false;
     for (var key in data.lights) {
         var light = data.lights[key],

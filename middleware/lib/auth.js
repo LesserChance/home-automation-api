@@ -14,7 +14,8 @@ module.exports = function (req, res, next) {
     } else if (req.path.indexOf("/tasker") > -1) {
         //match the key
         //todo: move key to the user db, check that this is in users
-        if (req.get('user-agent') === config.ryan_tasker_key) {
+        if (req.get('user-agent') === config.ryan_tasker_key
+            || req.get('user-agent') === config.meredith_tasker_key) {
             next();
         }
     } else if (req.path.indexOf("/twilio/") > -1) {

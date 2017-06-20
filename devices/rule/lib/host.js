@@ -49,6 +49,7 @@ RuleHost.prototype.getRule = function getRule(rule_name) {
 };
 
 RuleHost.prototype.createRules = function createRules() {
+    console.debug("Creating Rules...");
     Model.remove({}, function(){
         this.newModels()
     }.bind(this));
@@ -196,10 +197,10 @@ RuleHost.prototype.newModels = function newModels() {
 
                 if (ryan.get("location") === LOCATION.HOME && living_room_lights.state.on !== LIGHT_STATE.GROUP_OFF) {
                     //flash the lights blue
-                    living_room_lights.color("#0000FF", 5000);
+//                    living_room_lights.color("#0000FF", 5000);
 
                     //text ryan
-                    phone.sendSMS(ryan.get("phone_number"), data.friend.personaname + " signed on");
+//                    phone.sendSMS(ryan.get("phone_number"), data.friend.personaname + " signed on");
                 }
             }
         })

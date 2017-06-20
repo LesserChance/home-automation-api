@@ -125,6 +125,11 @@ module.exports = {
         api.request_router
             .route('/hue/scenes/:light_scene_id/on')
             .post(performPromise(hue.host, hue.host.loadScene));
+
+        // Create en entire scene
+        api.request_router
+            .route('/hue/scene')
+            .post(performPromise(hue.host, hue.host.createScene));
    }
 };
 
